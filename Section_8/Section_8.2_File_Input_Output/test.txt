@@ -1,0 +1,12 @@
+ISBN: 9-999-9999-9
+Units sold: 12
+Total Revenue: $120
+
+ISBN: 1-111-1111-1
+Units sold: 2
+Total Revenue: $21
+
+ISBN: 9-999-9999-9
+Units sold: 136
+Total Revenue: $4278
+

@@ -1,0 +1,5 @@
+a a a a b b b c c c c d d d 
+alphabet
+hello
+world 
+how are you?
