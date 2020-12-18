@@ -83,24 +83,37 @@ void e1110() {
 
 }
 
-std::pair<std::string, int> e1112(std::vector<std::string> &v, ) {        // accept a vector of strings. return pairs
-    if(!v.empty()) {
+// e11.12
 
-    } else {
-        return std::pair<std::string, int>();                   // return empty pair
+std::vector<std::pair<std::string, int>> makeVector() {
+    std::vector<std::pair<std::string, int>> pvec;
+    std::string s;
+    int i;
+
+    std::cout << "Please type a word and an associated number. Type @q to end: " <<std::endl;
+    while (std::cin >> s >> i) {
+        if(s == "@q") {
+            break;
+        } else {
+            pvec.push_back(std::pair<std::string, int>(s,i));
+        }
     }
+    return pvec;
 }
 
-void createVector(std::pair<std::string, int> p) {
-    std::vector<std::pair<std::string, int>> pvec;
-    pvec.push_back(p);
+void printVector(std::vector<std::pair<std::string, int>> vec) {
+    for (auto &e : vec) {
+        std::cout << "Word: " << e.first << " | Associated Number: " << e.second <<std::endl;
+    }
 }
 
 int main()
 {
     //printFamilies(makeFamilies());
     //e118();
-    e1110();
+    //e1110();
+    printVector(makeVector());
+
 
     return 0;
 }
