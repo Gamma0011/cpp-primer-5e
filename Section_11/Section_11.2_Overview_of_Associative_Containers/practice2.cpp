@@ -13,7 +13,7 @@
         By default, the library uses the < operator for the key type to compare the keys. In the set types, the key is the element type;
             In the map types, the key is the first element type.
 
-        **NOTE ** Callable objects passed to a sort algorithm must meet the same requiremenets as do the keys in an associative container.
+        **NOTE ** Callable objects passed to a sort algorithm must meet the same requirements as do the keys in an associative container.
 
         | KEY TYPES FOR ORDERED CONTAINERS |
             We can also supply our own operation to use in place of the default < operator on keys. The specified operation MUST define
@@ -45,8 +45,8 @@
             std::pair<std::string, std::string> author{"James", "Joyce"};
 
         | OPERATIONS ON PAIRS |
-            pair<T1, T2> p;             p is a pair with value initilized members of types T1 and T2
-            pair<T1, T2> p{v1, v2};     p is a pair with types T1 and T2. First and second members are initilized from v1 and v2;
+            pair<T1, T2> p;             p is a pair with value initialized members of types T1 and T2
+            pair<T1, T2> p{v1, v2};     p is a pair with types T1 and T2. First and second members are initialized from v1 and v2;
             pair<T1, T2> p = {v1, v2};  same as above ^^
             make_pair(v1, v2);          Returns a pair initialized from v1 and v2. The type of pair is inferred from types v1 and v2;
             p.first                     returns the (public) data member of p named first;
