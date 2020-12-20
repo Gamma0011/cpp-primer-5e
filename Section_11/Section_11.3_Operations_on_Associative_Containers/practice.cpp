@@ -43,6 +43,13 @@
             
             As an example, associative container function .find(key) directly fetches the element with the given key. 
             Using the generic find function would require a sequential search.
+
+    || ADDING ELEMENTS ||
+        Because map and set (as well as other corresponding unordered types) contain unique keys, inserting
+         an element that already is present has no effect. (ex. void addingElementsSet(), addingElementsMap())
+    
+        **NOTE** When inserting elements into a map, we must remember that the element type is a pair. Often,
+         we don't have a pair object that we want to insert. Instead, we create a pair in the arg list to insert.
 */
 
 void acAliases() {
@@ -86,6 +93,24 @@ void iteratingWord_Counter() {
                  << (it-> second > 1 ? " times." : " time.") << std::endl;
         ++it;
     }
+}
+
+void addingElementsSet() {
+    std::vector<int> ivec = {2,4,6,8,2,4,6,8};      // ivec has 8 elements
+    std::set<int> set2;                             // empty set                {}
+    set2.insert(ivec.begin(), ivec.end());          // set2 has 4 elements      {2,4,6,8}  
+    set2.insert({1,3,5,7,1,3,5,7});                 // set2 now has 8 elements  {1,2,3,4,5,6,7,8}
+}
+
+void addingElementsMap() {
+    std::map<std::string, int> word_count;
+    std::string word;
+
+    // four ways to add word to word_count
+    word_count.insert({word, 1});                               // under C++11, this is the easiest way to create a pair
+    word_count.insert(std::make_pair(word, 1));                 // call to make_pair
+    word_count.insert(std::pair<std::string, int>(word, 1));    // explicitly construct pair
+    word_count.insert(std::map<std::string, int>::value_type(word, 1)); // constructs new object of pair type and inserts into map
 }
 
 int main()
