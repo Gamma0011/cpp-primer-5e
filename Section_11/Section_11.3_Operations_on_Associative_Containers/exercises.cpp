@@ -49,6 +49,25 @@
     e11.22  - Given a map<string, vector<int>> write the types used as an argument and as the return value for the version
                 of insert that inserts one element.
 
+                std::pair<std::string, std::vector<int>>     // argument
+                std::pair<std::map<std::string, std::vector<int>::iterator, bool>>  // return
+    
+    e11.23  - Rewrite the map that stored vectors of children's names with a key that is the family last name
+                for the exercises in 11.2.1 to use a multimap.
+
+    e11.24  - What does the following program do?
+                map<int, int> m;    // create a map with int key and int value
+                m[0] = 1            // search for element with key = 0, if not found, create key 0 and value = 1
+
+    e11.25  - Contract the following program with the one in the previous exercise:
+                vector<int> v;      // create a vector that holds elements of type int;
+                v[0] = 1;           // set element in position 0 == 1;
+
+    e11.26  - What type can be used to subscript a map? What type does the subscript operator return? Give concrete a
+                example -- define a map and then write the types that can be used to subscript the map and the type
+                that would be returned from the subscript operator
+
+                The standard return type of a map is its key type. However, when subscripting, the return type 
 */
 
 void e1116() {
@@ -128,8 +147,29 @@ void e1120() {
     }
 }
 
-void e1121() {
-    std::map<std::string, std::vector<int>> smap;
+void e1123() {
+    std::multimap<std::string, std::string> mmap;
+    std::string ln, fn;
+
+    std::cout << "Please enter a last name and first name. Type @q to quit." << std::endl;
+    for ( ; std::cout << "Last Name: ", std::cin >> ln && ln != "@q" ; ) {
+        for ( ; std::cout << "First Name: ", std::cin >> fn ; ) {
+            mmap.emplace(ln, fn);
+            break;
+        }
+    }
+
+    for (auto &s : mmap) {
+        std::cout << "First Name: " << s.second << " Last Name: " << s.first <<std::endl;
+    }
+
+}
+
+void e1126() {
+    std::map<char, int> cmap;
+
+    std::cout << typeid(std::map<char, int>::key_type).name() << std::endl;     // returns type char (key)
+    std::cout << typeid(decltype(cmap['t'] = 0)).name() <<std::endl;            // returns type int (value)
 
 
 }
@@ -138,7 +178,9 @@ int main()
 {
     //e1116();
     //e1117();
-    e1120();
+    //e1120();
+    //e1123();
+    e1126();
 
     return 0;
 }

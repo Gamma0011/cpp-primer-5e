@@ -54,6 +54,41 @@
                 ex. auto it = authors.insert("Author", "Book");     returns an iterator to the position in which element was inserted
                     std::multimap<std::string, std::string>::iterator it = authors.insert("Author", "Book");        // Same as above, without auto
 
+        | ERASING ELEMENTS |
+            We can erase one element or a range of elements by passing erase as an iterator or an iterator pair. For types that
+             allow multiple keys (multimap and multiset), the number of elements removed could be > 1.
+             
+                ex. auto cnt = authors.erase("Barth, John");
+
+                    prev:   authors.insert({"Barth, John", "Sot-Weed Factor"});
+                            authors.insert({"Barth, John", "Lost in the Funhouse"});
+
+            | REMOVING ELEMENTS FROM AN ASSOCIATIVE CONTAINER |
+            c.erase(k)      Removes every element with key k from c. Returns size_type of # elements removed/
+            c.erase(p)      Removes element denoted by iterator p from c. p must refer to element in c && != c.end()
+                            Returns an iterator to the element after p or c.end(), if p denotes last element in c
+            c.erase(b,e)    Removes the elements in the range denoted by iterator pair b,e. Returns e.
+
+
+        | SUBSCRIPTING A MAP |
+            Map and unordered_map provide the subscript operator [ ] and corresponding .at() function. Set types do not support
+             subscripting since there is no value associated with a key in a set. Additionally, multimap or unordered_multimap do not
+             support subscripting as there may be multiple values with key.
+
+            Map subscript takes an index (key) and fetches the value associated with the key. If the key is not already present,
+             a new element is created and inserted into the map for that key. Value is value initialized.
+
+            **NOTE** Since subscripting can insert elements, only will work on non-const maps;
+
+            When we subscript a map, we get a mapped_type object; when we dereference a map iterator, we get a value_type object
+            The map subscript operator returns an lvalue, which means we can read or write the element.
+
+            | SUBSCRIPT OPERATIONS FOR MAP AND UNORDERED_MAP |
+            c[k]        Returns the element with key k; if k not in c, adds new, value-initialized element with key k
+            c.at(k)     Checked access to element with key k; throws out_of_range exception if k not in c
+
+            see. void subscriptingMap();
+
 */
 
 void testingReturnInsert() {
@@ -73,14 +108,40 @@ void testingReturnInsert() {
 void insertMultimap() {
     std::multimap<std::string, std::string> authors;
     // add the first element with the key Barth, John
-    authors.insert("Barth, John", "Sot-Weed Factor");
+    authors.insert({"Barth, John", "Sot-Weed Factor"});
     // ok, adds the second element with they key Barth, John
-    authors.insert("Barth, John", "Lost in the Funhouse");
+    authors.insert({"Barth, John", "Lost in the Funhouse"});
+}
+
+
+void erasePractice() {
+    std::map<std::string, std::size_t> word_count;
+    std::string removal_word = "test";
+
+    //erase key. return number of elements removed.
+    if (word_count.erase(removal_word)) {
+        std::cout << "found: " << removal_word << " removed" <<std::endl;
+    } else {
+        std::cout << removal_word << " not found!" <<std::endl;
+    }
+}
+
+void subscriptingMap() {
+    std::map<std::string, std::size_t> word_count;      // empty map
+    // insert a value-initialized element with key Anna; then assign 1 to its value;
+    word_count["Anna"] = 1;
+    // Anna is key (std::stirng), 1 is value (std::size_t);
+
+    // Working with return value of subscript operator 
+    std::cout << word_count["Anna"] <<std::endl;    // fetch the element indexed by Anna; prints 1
+    ++word_count["Anna"];                           // increment value of associated key "Anna" by 1
+    std::cout << word_count["Anna"] <<std::endl;    // prints 2;
+
 }
 
 int main()
 {
-
+    subscriptingMap();
 
     return 0;
 }
