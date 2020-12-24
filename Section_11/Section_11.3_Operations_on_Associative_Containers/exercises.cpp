@@ -68,6 +68,32 @@
                 that would be returned from the subscript operator
 
                 The standard return type of a map is its key type. However, when subscripting, the return type 
+
+    e11.27  - What kind of problems would you use count to solve? When might you use find?
+                .count() would be useful when you want to know how many elements are in a multimap or multiset, i.e. if you want to 
+                 place a limit on how many matching entries there can be.
+                .find() is useful in maps or sets where there cannot be unique keys, but you want to see if the elements exists. Also prevents
+                 one from accidentally adding elements in the case an element is not found (unlike subscripting)
+    
+    e11.28  - Define and initialize a variable to hold the result of calling find on a map from string to vector of ints.
+
+    e11.29  - What do upper_bound, lower_bound, and equal_range return when you pass a key that is not in a container?
+                upper_bound     - returns the point in the container where the element can be inserted to maintain container order
+                lower_bound     - returns the point in the container where the element can be inserted to maintain container order
+                equal_range     - pair<it1, it2> it1 == it2, which declares the point where element can be inserted into container
+
+    e11.30  - Explain the meaning of pos.first->second used in the output expression of the final program in this section.
+                auto pos == pair<c.lower_bound(element), c.upper_bound(element)> || auto pos == pair<it1, it2>
+
+                pos.first           - accesses the first object of the pair, which is the current iterator
+                    first->second   - from the current iterator, access the key of that pointer (*first).second
+                
+    e11.31  - Write a program that defines a multimap of authors and their works. Use find to find an element in the multimap and erase that element.
+                Be sure your program works correctly if the element you look for is not in the map.
+
+    e11.32  - Using the multimap from the previous exercise, write a program to print the list of authors and their works alphabetically.
+                **NOTE** Multimap alphabetizes the keys already, iterating through the container is simple .begin() -> .end() after matched element
+                has been erased
 */
 
 void e1116() {
@@ -174,13 +200,36 @@ void e1126() {
 
 }
 
+void e1128() {
+    std::map<std::string, std::vector<int>> m = { {"hello", {1,2,3,4,5}},
+                                                  {"day", {1,2,3}}};
+    // auto it = m.find("hello");
+    std::map<std::string, std::vector<int>>::iterator it = m.find("hello"); // non-auto declaration of type
+    std::cout << it->first << '\t';
+    for (auto &i : it->second) { std::cout << i << '\t'; }
+    std::cout << std::endl;
+}
+
+void e1131() {
+    std::multimap<std::string, std::string> authors = { {"LoTR", "JRR Tolkien"},
+                                                        {"The Hobbit", "JRR Tolkien"},
+                                                        {"Unfinished Tales", "JRR Tolkien"},
+                                                        {"Moby Dick", "Herman Melville"} };
+    std::string search("The Hobbit");
+    auto it = authors.find(search);
+    if (it != authors.end()) { authors.erase(it); }         // don't erase if it returns off-the-end iterator
+    for(auto pos = authors.begin() ; pos != authors.end(); ++pos) { std::cout << pos->first << " : " << pos->second <<std::endl; }
+}
+
 int main()
 {
     //e1116();
     //e1117();
     //e1120();
     //e1123();
-    e1126();
+    //e1126();
+    //e1128();
+    e1131();
 
     return 0;
 }
