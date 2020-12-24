@@ -55,6 +55,8 @@
                  of iterators. If they key is present, then first iterator == first instance of key, and second == one past the last instance of key. If no
                  matching pair found (it1 == it2) == .end();
 
+    | A WORD TRANSFORMATION MAP |
+        see wordTransformation.cpp
 */
 
 void findForMaps() {

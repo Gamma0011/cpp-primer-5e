@@ -94,6 +94,29 @@
     e11.32  - Using the multimap from the previous exercise, write a program to print the list of authors and their works alphabetically.
                 **NOTE** Multimap alphabetizes the keys already, iterating through the container is simple .begin() -> .end() after matched element
                 has been erased
+    
+    e11.33  - Implement your own version of the word-transformation program.
+                see e1133.cpp
+    
+    e11.34  - What would happen if we used the subscript operator instead of .find() in the transformation function?
+                
+                Using the subscript operator would have created keys and default-initialized string values for every word
+                 not found in the map. We've protected ourselves against this as well by declaring the map input into transformation
+                 as a const &map. 
+    
+    e11.35  - In buildMap, what effect, if any would there be from rewriting:
+                trans_map[key] = value.substr(1); as
+                trans_map.insert({key, value.substr(1)});   ?
+
+                subscript operator adds the last value for a matching key.
+                .insert() operator adds the first value for that matching key.
+
+    e11.36  - Our program does not checking on the validity of either input file. In particular, it assumes that the 
+                rules in the transformation file are sensible, What would happen if a line in the file has a key, one space
+                and then the end of line? Predict this behavior and then check against your version of the program.
+
+                Prediction - .size() = 1, therefore no key is created.
+
 */
 
 void e1116() {
