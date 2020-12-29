@@ -43,6 +43,28 @@
                     Pros: Compiler will not use contructor in an automatic conversion
                     Cons: Cannot use copy initialization because constructor is explicit
 
+    e12.6   - Write a function that returns a dynamically allocated vector<int>. Pass that vector to another function that reads
+                the std::cin to give values to the elements. Pass the vector to another function to print the values read.
+                Remember to delete the vector at the appropriate time.
+
+    e12.7   - Redo the previous exercise, this time using shared_ptr
+
+    e12.8   - Explain what, if anything is wrong with the following function.
+                bool b() { int* p = new int;     return p; }
+
+                pointer is converted to boolean value. While valid, p cannot be freed and memory leakage will occur.
+
+                "A prvalue of integral, floating-point, unscoped enumeration, pointer, and pointer-to-member types can 
+                be converted to a prvalue of type bool. "
+                Source: https://en.cppreference.com/w/cpp/language/implicit_conversion
+    
+    e12.9   - Explain what happens in the following code:
+                int *q = new int(42), *r = new int(100);        // q & r point to dynamically allocated objects 42 and 100
+                r = q;                                          // r points to object of q now | *r = 42, *q = 42;
+                                                                // memory leak occurs. original object r not deleted and now not accessible
+                auto q2 = make_shared<int>(42), r2 = make_shared<int>(100);
+                r2 = q2;                                        // r2 points to object q2. r2 memory automatically freed.
+
 */
 
 class NewStrBlob {
@@ -79,9 +101,46 @@ const std::string &NewStrBlob::back() const {
     return data->back();                            // if no error
 }
 
+// e12.6
+std::vector<int>* makeVec() {
+    std::vector<int> *ivec = new std::vector<int>;
+    return ivec;
+}
+std::vector<int>* addElements(std::vector<int> *ivec) {
+    int i;
+    while(std::cin >> i && i != -1) { ivec->push_back(i); }
+    return ivec;
+}
+void printElements(std::vector<int> *ivec) {
+    for (auto &i : *ivec) { std::cout << i << '\t'; }
+    std::cout <<std::endl;
+    delete ivec;
+}
+
+// e12.7
+std::shared_ptr<std::vector<int>> createVec() {
+    auto pv = std::make_shared<std::vector<int>>();
+    return pv;
+}
+std::shared_ptr<std::vector<int>> insertElements(std::shared_ptr<std::vector<int>> pv) {
+    int i;
+    std::cout << "Please enter numbers. Type -1 to exit: " << std::endl;
+    while (std::cin >> i && i != -1) { pv->push_back(i); }
+    return pv;
+}
+void displayElements(std::shared_ptr<std::vector<int>> pv) {
+    for (auto &i : *pv) { std::cout << i << '\t'; }
+    std::cout <<std::endl;
+}
+
+
 int main()
 {
+    // e12.6
+    //printElements(addElements(makeVec()));
 
+    // 12.7
+    //displayElements(insertElements(createVec()));
 
     return 0;
 }
