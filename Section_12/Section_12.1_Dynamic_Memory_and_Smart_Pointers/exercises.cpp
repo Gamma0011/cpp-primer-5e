@@ -65,7 +65,38 @@
                 auto q2 = make_shared<int>(42), r2 = make_shared<int>(100);
                 r2 = q2;                                        // r2 points to object q2. r2 memory automatically freed.
 
+    e12.10  - Explain whether the following call to the process function defined on page 464 is correct. If not, how would you 
+                correct the call?
+                    shared_ptr<int> p(new int(42));
+                    process(shared_ptr<int>(p));
+
+                    Legal, but not needed. p is already of type shared_ptr<int> and doesn't require conversion
+
+    e12.11  - What would happen if we called process as follows?
+                process(shared_ptr<int>(p.get()));
+
+                Once p leaves scope (process function ends), object of p will be deleted and memory freed. 
+
+    e12.12  - Using the declarations of p amd sp, explain each of the following calls to process. If the call is legal,      
+                explain what it does. If not legal, why?
+                
+                auto p = new int();             p pointer to statically allocated memory
+                auto sp = make_shared<int>();   sp pointer to dynamically allocated memory
+                a) process(sp);         // no issues. sp is shared_ptr<int>
+                b) process(new int());  // error: will need to convert to shared_ptr<int>(new int()) for function to work
+                c) process(p);          // error: will need to pass shared_ptr<int>(p) to work. cannot convert from int*
+                d) process(shared_ptr<int>(p)); // okay, will work. int* converted to shared_ptr<int>
+    
+    e12.13  - What happens if we execute the following code?
+                auto sp = make_shared<int>();           // dynamically allocated 
+                auto p = sp.get();                      // pointer to sp returns and assigned to p. p 
+                delete p;                               // p deleted
+
+                see. void e1213();
+
 */
+
+std::shared_ptr<int> process(std::shared_ptr<int> p) { return p; }
 
 class NewStrBlob {
 public:
@@ -133,6 +164,26 @@ void displayElements(std::shared_ptr<std::vector<int>> pv) {
     std::cout <<std::endl;
 }
 
+void e1210() {
+    std::shared_ptr<int> p(new int(42));
+    std::cout << p.use_count() << std::endl;
+    process(std::shared_ptr<int>(p));
+    std::cout << p.use_count() << std::endl;
+}
+
+void e1211() {
+    std::shared_ptr<int> p(new int(24));
+    process(std::shared_ptr<int>(p.get()));
+        std::cout << *p <<std::endl;
+}
+
+void e1213() {
+    auto sp = std::make_shared<int>();          // sp points to value-initialized object of type int
+    auto p = sp.get();                          // p is int* to sp;
+    std::cout << sp.use_count() <<std::endl;
+    delete p;                                   // int* removed, which also frees memory for sp; sp now dangling pointer;
+    std::cout << sp.use_count() <<std::endl;
+}
 
 int main()
 {
@@ -141,6 +192,10 @@ int main()
 
     // 12.7
     //displayElements(insertElements(createVec()));
+
+    //e1210();
+    //e1211();
+    //e1213();
 
     return 0;
 }

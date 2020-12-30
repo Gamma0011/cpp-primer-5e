@@ -42,11 +42,50 @@
         shared_ptr<T> p(p2, d)  p is copy of shared_ptr p2. p uses callable object d instead of delete
         p.reset()               if p is only shared_ptr pointing to object, reset frees p's object to null
         p.reset(q)              if optional pointer q is passed, makes p point to q, otherwise makes p null
-        p.reset(q, d)           if d supplied, will call d to free q, otherwise, uses delete to free q    
+        p.reset(q, d)           if d supplied, will call d to free q, otherwise, uses delete to free q   
+
+
+        Although the compiler will not complain, it is an error to bind another smart pointer to the pointer returned by .get()
+            shared_ptr<int> p(new int(42));     // ref count == 1
+            int *q = p.get();                   // ok: don't use q in any way that might delete its pointer
+                { // new block
+                    // undefined: two independent shared_ptrs point to same memory
+                    shared_ptr<int>(q);
+                    } // block ends and q is destroyed. memory to which q points freed
+                    int foo = *q;           // undefined, memory in which p points freed
+            
+            ** Use get only to pass access to the pointer to code you know will not delete the pointer. In particular,
+                never use get to initialize or assign to another smart pointer. **
+            
+        || OTHER SHARED_PTR OPERATIONS ||
+            The shared_ptr class gives us a few other operation. Reset can be used to assign a new pointer to a shared_ptr
+                p = new int(1024);      // error: cannot assign a pointer to a shared_ptr
+                p.reset(new int(1024)); // ok; p points to a new object
+            
+            Like assignment, reset updates the ref count and deletes the object to which p points. Reset is often used
+                together with unique to control canges to the object shared among several shared_ptrs.
+
+            Before changing the underlying object, we check whether we're the only user. 
+            If not, we make a new copy before making change
+                see. void resetFunction();
+                
 */
 
 // coordination of smart pointers
 void process(std::shared_ptr<int> ptr) { }  // use ptr, then it leaves scope. Entering, ptr ref count == 2, leaving == 1
+
+void resetFunction() {
+    std::shared_ptr<std::string> p(new std::string("Hello World!"));
+    std::cout << *p <<std::endl;
+    std::string newVal(" Hello Universe!");
+
+    if (!p.unique()) {
+        p.reset(new std::string(*p));
+    }
+    *p += newVal;
+    std::cout << *p <<std::endl;
+
+}
 
 int main()
 {
@@ -54,6 +93,8 @@ int main()
     std::shared_ptr<int> p(new int(42));        // reference count == 1
     process(p);                                 // copying p increments count, in process reference count == 2
     int i = *p;                                 // ok: reference count is 1
+
+    resetFunction();
 
     return 0;
 }
