@@ -94,6 +94,21 @@
 
                 see. void e1213();
 
+    e12.16  - Compilers don't always give easy-to-understand error messages if we attempt to copy or assign a unqiue_ptr.
+                Write a program that contains these errors to see what your compiler does.
+
+                see. void e1216();
+    
+    e12.17  - Which of the following unique_ptr declarations are illegal or likely to result in subsequent program error?
+                Explain what the problem is.
+
+                see. void e1217();
+
+    e12.18  - Why doesn't shared_ptr have a release member?
+                Release exists for unique_ptr because only one unique_ptr at a time can refer to an object. To properly transfer
+                 ownership, we must release ownership from one and assign to another. Shared_ptr can have mutiple pointers pointing
+                 to the same object. As pointers stop pointing or leave scope, the program automatically "releases" them and reduces
+                 the use count until a point that .use_count() == 0 and the object is deleted.
 */
 
 std::shared_ptr<int> process(std::shared_ptr<int> p) { return p; }
@@ -185,6 +200,30 @@ void e1213() {
     std::cout << sp.use_count() <<std::endl;
 }
 
+void e1216() {
+    std::unique_ptr<int> p1(new int(42));   
+    std::unique_ptr<int> p2;
+    //p2 = p1;                      // error: use of deleted function
+    //std::unique_ptr<int> p3(p1);  // error: use of deleted function
+    std::unique_ptr<int> p4(p1.release());
+    (p1 == nullptr) ? std::cout << "p1 == nullptr" <<std::endl : std::cout << *p1 <<std::endl;
+    std::cout << "p4 == " << *p4 <<std::endl;
+}
+
+void e1217() {
+    int ix = 1024, *pi  = &ix, *pi2 = new int(2048);
+    typedef std::unique_ptr<int> IntP;
+    //IntP p0(ix);              // ix needs to be declared as new. IntP p0(new int(ix));
+        IntP p0(new int(ix));   // fixed
+    //IntP p1(pi);              // pi will compile, but is in error since this is a static pointer and not one formed by new
+        IntP p1(new int(*pi));  // fixed, p1 points to object of pi
+    //IntP p2(pi2);             // will cause dangling pointer when out of scope. p2 deletes object of pi2, but pi2 still exists
+    //IntP p3(&ix);             // &ix returns a reference to memory for ix. will compile, but is also in error. object not created with new
+    IntP p4(new int(2048));     // proper way to declare
+    //IntP p5(p2.get());          // two unique_ptrs pointing to same object (pi2).
+        //IntP p5(p2.release());  // technically correct, but p2 still causes dangling pointer
+}
+
 int main()
 {
     // e12.6
@@ -196,6 +235,8 @@ int main()
     //e1210();
     //e1211();
     //e1213();
+    //e1216();
+    e1217();
 
     return 0;
 }
