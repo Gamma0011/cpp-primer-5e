@@ -109,6 +109,16 @@
                  ownership, we must release ownership from one and assign to another. Shared_ptr can have mutiple pointers pointing
                  to the same object. As pointers stop pointing or leave scope, the program automatically "releases" them and reduces
                  the use count until a point that .use_count() == 0 and the object is deleted.
+
+    e12.21  - We could have written StrBlobPtr's deref member as follows. Which do you think is better and why?
+                std::string& deref() { return (*check(curr, "dereference past end"))[curr]; }
+
+                I think the original return (*p)[curr]; is better because it is clear what the return is. Whatever auto p = check(curr, " ") returns will be dereferenced then returned at that [curr] element
+                 This also might be better since the rest of our program's functions run the check() function then print their return, rather than combining it.
+
+    e12.22  - What changes would need to be made to StrBlobPtr to create a class that can be used with a const StrBlob? Define a class named ConstStrBlobPtr that can point to a const StrBlob
+                    see strblobs.h (class ConstStrBlobPtr)
+
 */
 
 std::shared_ptr<int> process(std::shared_ptr<int> p) { return p; }

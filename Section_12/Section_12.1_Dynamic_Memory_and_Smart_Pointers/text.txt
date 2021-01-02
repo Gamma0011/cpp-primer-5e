@@ -1,0 +1,4 @@
+this is a text document
+that we will read
+from for exercise
+12.20
