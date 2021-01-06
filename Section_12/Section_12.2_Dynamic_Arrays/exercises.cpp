@@ -9,6 +9,19 @@
     e12.23  - write a program to concatentate two string literals, putting the result in a dynamically allocated array of char. write a program to concatentate two library
                 strings that have the same value as the literals used in the first program
 
+    e12.24  - write a program that rads a string from the std::cin into a dynamically allocated character array. Describe how your program handles varying size inputs. Test
+                by giving it a string of data that is longer than the array size allocated.
+
+                    The program handles varying size inputs without too much an issue since it's calculating the length and incrementing both the position for the dynamically-allocated
+                     array and the character position in the string properly. Inputting more characters than allotted won't write any more inputs to the array since the cnt is
+                     past the element amount. However, one thing that is weird, is that characters go missing sometimes (print out only 16-18 instead of 20). Entering exactly 20 characters
+                     doesn't cause much of an issue.
+    
+    e12.25  - Given the following new expression, how would you delete pa?
+                    int *pa = new int[10];
+                    
+                    delete [] pa;
+
 */
 
 void e1223sl() {
@@ -36,13 +49,28 @@ void e1223ls() {
 
     c.release();                                                                            // deallocate memory
     std::cout << "\nMemory Released." <<std::endl;
+}
+
+void e1224() {
+    std::size_t cnt = 0;
+    std::unique_ptr<char[]> cptr(new char[20]);
+
+    for (std::string s ; std::cin >> s && s != "@q"; ++cnt) {
+        for (std::size_t length = s.length(), i = 0; i != length ; ++cnt, ++i) { cptr[cnt] = s[i]; }
+    }
+
+    for (std::size_t i = 0 ; i != 20 ; ++i) { std::cout << cptr[i]; }
+    
+    cptr.release();
+    std::cout << "\nPointer Released." << std::endl;
 
 }
 
 int main()
 {
     //e1223sl();
-    e1223ls();
+    //e1223ls();
+    e1224();
 
     return 0;
 }

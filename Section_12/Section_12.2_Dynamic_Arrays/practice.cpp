@@ -98,6 +98,43 @@
 
                 see. void iteratingsPtrArrays();
 
+        
+    || THE ALLOCATOR CLASS ||
+        An aspect of new that limits its flexibility is that new combines allocating memory with constructing objects in that memory. Delete combines destruction with deallocation.
+         Combining initialization with allocation is usually what we want when we allocate a single object. When we allocate a block of memory, we often plan to construct objects
+         in that memory as needed. In this case, we'd like to decouple memory allocation from object construction.
+        
+        Decoupling construction from allocation means we can allocate memory in large chunks, and pay the overhead of constructing objects only when we need to create them.
+
+        Generally, coupling allocation and construction can be wasteful.
+            see. void allocConstruct();
+
+            In the example above, we create an array of 10 strings, but we might not need 10 strings. Therefore, we might have created objects that are never used. Additionally,
+             for the objects that are used, we immediately assign new values over the previously initialized strings, causing 2 writes - default initialization and when 
+             we assign new objects.
+
+             Classes that do not have default constructors cannot be allocated as an array.
+
+        | THE ALLOCATOR CLASS |
+            The library allocator class, defined in <memory> header, lets us separate allocation from construction. It provides type-aware allocation of raw, unconstructed memory.
+             Like vector, allocator is a template. To define allocator, we must specify the type of objects a particular allocator can allocate. When an allocator object allocates
+             memory, it allocates memory that is appropriately sized and aligned to hold objects of the given type.
+
+             std::allocator<std::string> alloc;         // object that can allocate strings
+             auto const p = alloc.allocate(n);          // allocate n unconstructed strings
+
+            | STANDARD ALLOCATOR CLASS AND CUSTOMIZED ALGORITHMS |
+            allocator<T> a          defines an allocator object named a that can allocate memory for objects of type T 
+            a.allocate(n)           allocates raw, unconstructor memory to hold n objects of type T
+            a.deallocate(p, n)      deallocates memory that help n objects in type T starting at address of pointer p; P must be a pointer
+                                     previously returned by allocate, and n must be the size requested when p was created. The user must call
+                                     destroy on any objects that were constructed in this memory before calling deallocate.
+            a.construct(p, args)    p must be a pointer to type T that points to raw memory, args are passed to a constructor for type T, which is
+                                     used to construct an object in the memory pointed to by p
+            a.destroy(p)            Runs the destructor on the object pointed to by the T* pointer p
+
+
+            
 
 
 */
@@ -132,6 +169,18 @@ void iteratingsPtrArrays() {
     for (std::size_t i = 0; i != 10; ++i) { std::cout << sp[i] <<' '; }
     std::cout << "Deallocating sp." <<std::endl;
     sp.reset();
+}
+
+void allocConstruct() {
+    std::string *const p = new std::string[10];     // construct 10 empty strings
+    std::string s;
+    std::string *q = p;                                 // q points to p[0]
+
+    while (std::cin >> s && q != p + 10) { *q++ = s; }
+
+    const std::size_t size = q - p;                     // remember how many strings we read
+    delete [] p;
+
 }
 
 int main()
