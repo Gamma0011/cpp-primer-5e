@@ -121,7 +121,15 @@
              memory, it allocates memory that is appropriately sized and aligned to hold objects of the given type.
 
              std::allocator<std::string> alloc;         // object that can allocate strings
-             auto const p = alloc.allocate(n);          // allocate n unconstructed strings
+             auto const p = alloc.allocate(2);          // allocate 2 unconstructed strings that are pointed to by p
+             alloc.construct(p, "Hello");               // at the memory pointed to by p, initialize string to be "Hello"
+             alloc.construct(p+1, "World");             // at memory pointed to by p + 1, initialize string to be "World"
+             alloc.destroy(p);                          // destruct object at p (Hello)
+             alloc.destroy(p+1);                        // destruct object at p+1 (World)
+             alloc.deallocate(p, 2);                    // deallocate storage for p
+
+             Steps:     Create Allocator >> Create Pointer to [allocator].allocate(size) >> [allocator].construct(*, arg) 
+                            >> [allocator].destroy(*) >> [allocate].deallocate(*, size);
 
             | STANDARD ALLOCATOR CLASS AND CUSTOMIZED ALGORITHMS |
             allocator<T> a          defines an allocator object named a that can allocate memory for objects of type T 
@@ -133,10 +141,19 @@
                                      used to construct an object in the memory pointed to by p
             a.destroy(p)            Runs the destructor on the object pointed to by the T* pointer p
 
+            Any size argument passed to deallocate must be the same size used in the call to allocate used to allocate memory to that pointer.            
 
-            
+        | ALGORITHMS TO COPY AND FILL UNINITIALIZED MEMORY |
+            As a companion to the allocator class, the library also defines two algorithms that can construct objects in uninitialized memory. 
+                Defined in the <memory> header
 
+            || ALLOCATOR ALGORITHMS ||
+            uninitialized_copy(b, e, b2)        Copies elements from input range b and e into unconstructed raw memory noted by iterator b2.
+            uninitialized_copy_n(b, n, b2)      Copies n elements starting from one denoted by iterator b into raw memory starting at b2.
+            uninitialized_fill(b, e, t)         Constructs objects in the range of raw memory denoted by iterators b and e as a copy of t
+            uninitialized_fill_n(b, n, t)       Constructs an unsigned number n objects starting at b. b must denote unconstructed raw memory > # inserted objects
 
+            see. allocAlgPractice();
 */
 
 std::size_t get_size() { return 10; }
@@ -180,6 +197,39 @@ void allocConstruct() {
 
     const std::size_t size = q - p;                     // remember how many strings we read
     delete [] p;
+}
+
+void allocPractice() {
+    std::allocator<std::string> alloc;
+    auto const p = alloc.allocate(10);
+    auto q = p;                 // q will point to one past the last constructed element
+    alloc.construct(q++);       // *q is an empty string
+    //alloc.construct(++q, 10, 'c');  // *q is cccccccccc
+    //alloc.construct(++q, "hi");     // *q is hi
+
+    std::cout << *q <<std::endl;
+    // std::cout << *p <<std::endl;     // disaster, q points to unconstructed memory
+
+    while (q != p) {
+        alloc.destroy(--q);             // free the strings we allocated
+    }
+
+    alloc.deallocate(p, 10);            // free memory
+}
+
+void allocAlgPractice() {
+    // copy vector of ints into dynamic memory
+    std::vector<int> vi = {0,1,2,3,4,5,6,7,8,9};
+
+    // allocate 2x many elements as vi holds
+    std::allocator<int> alloc;
+    auto p = alloc.allocate(vi.size() * 2);
+
+    // construct elements starting at p as copies of elements in vi
+    auto q = std::uninitialized_copy(vi.begin(), vi.end(), p);      // q is an iterator to one past the last element copied into p
+
+    // initialize the remaining elements to 42
+    std::uninitialized_fill_n(q, vi.size(), 42);
 
 }
 
@@ -187,7 +237,9 @@ int main()
 {
     // allocateEmptyArray();
     // uPtrSubScript();
-    iteratingsPtrArrays();
+    //iteratingsPtrArrays();
+    //allocPractice();
+
 
     return 0;
 }

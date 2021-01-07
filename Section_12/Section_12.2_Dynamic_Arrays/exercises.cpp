@@ -22,6 +22,8 @@
                     
                     delete [] pa;
 
+    e12.26  - rewrite the program on pg 481 using an allocator
+
 */
 
 void e1223sl() {
@@ -66,11 +68,27 @@ void e1224() {
 
 }
 
+void e1226(int n) {
+    std::allocator<std::string> salloc;
+    auto const p = salloc.allocate(n);
+    auto q = p;                         // iterator
+
+    for (std::string s ; std::cin >> s && q != (p + n) ; ++q) { salloc.construct(q, s); }
+
+    while (q != p) {
+        std::cout << *--q <<std::endl;   // dereference and iterate backwards through memory
+        salloc.destroy(q);               // destroy object to which iterator q points
+    }
+
+    salloc.deallocate(p, n);            // deallocate memory used by p
+}
+
 int main()
 {
     //e1223sl();
     //e1223ls();
-    e1224();
+    //e1224();
+    e1226(10);
 
     return 0;
 }
