@@ -30,7 +30,55 @@
                     set for any given word.
                 - Shared_ptrs will also be used.
 
+
+    e12.27  - the TextQuery and QueryResult classes only use capabilities that we have already covered. Without looking ahead, write your own versions of these classes.
 */
+
+class TextQuery {                                                   // this class will hold the data
+public:
+    friend class QueryResult;
+    TextQuery(std::ifstream &ifs) {
+        int cnt = 0;
+        while (std::getline(ifs, line)) { 
+            svec.push_back(line);                                   // write line to vector<string>
+            for (std::istringstream read; read >> word; ++cnt) {
+                smap[word].insert(cnt);                             // write word and corresponding line number to map<string, vector<int>>
+            }
+        }
+    }; 
+    QueryResult query(const std::string &) const { };
+private:
+    std::string line, word;
+    std::vector<std::string> svec;
+    std::map<std::string, std::set<int>> smap;
+};
+
+class QueryResult {
+public:
+    QueryResult& query(const std::string &search) const {
+        
+    };
+
+private:
+};
+
+void runQueries(std::ifstream &infile) {
+   //infile is an ifstream that is the file we want to query
+    TextQuery tq(infile);
+    while (true) {
+        std::cout << "Enter word to look for, or q to quit: ";
+        std::string s;
+        // stop if we hit end-of-file on the input, or if a 'q' is entered
+        if (!(std::cin >> s) || (s == "q")) {
+            break;
+        }
+        print(std::cout, tq.query(s)) <<std::endl;
+    }
+}
+
+std::ostream &print(std::ostream &os, std::string s) {
+ 
+};
 
 int main()
 {
