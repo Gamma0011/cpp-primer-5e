@@ -34,51 +34,62 @@
     e12.27  - the TextQuery and QueryResult classes only use capabilities that we have already covered. Without looking ahead, write your own versions of these classes.
 */
 
-class TextQuery {                                                   // this class will hold the data
+class QueryResult;
+
+class TextQuery {
 public:
     friend class QueryResult;
     TextQuery(std::ifstream &ifs) {
-        int cnt = 0;
-        while (std::getline(ifs, line)) { 
-            svec.push_back(line);                                   // write line to vector<string>
-            for (std::istringstream read; read >> word; ++cnt) {
-                smap[word].insert(cnt);                             // write word and corresponding line number to map<string, vector<int>>
+        int lineNo = 0;                                                                     
+        for (std::string line, word ; std::getline(ifs, line) ; svec->push_back(line)) {    // write lines into svec
+            for (std::istringstream iss(line); iss >> word ;  ) {
+                smap[word]->insert(lineNo);                                                 // read words from line into smap, note line number
             }
-        }
-    }; 
+            ++lineNo;                                                                       // increment line counter
+        };
+    };
     QueryResult query(const std::string &) const { };
 private:
-    std::string line, word;
-    std::vector<std::string> svec;
-    std::map<std::string, std::set<int>> smap;
+    std::shared_ptr<std::vector<std::string>> svec;
+    std::map<std::string, std::shared_ptr<std::set<int>>> smap;
 };
 
 class QueryResult {
 public:
-    QueryResult& query(const std::string &search) const {
-        
-    };
-
+    friend std::ostream &print(std::ostream &, const QueryResult &);
+    QueryResult(std::string s, std::shared_ptr<std::vector<std::string>> v, std::shared_ptr<std::set<int>> i) : searchedWord(s), qrVec(v), qrSet(i) { };
 private:
+    std::string searchedWord;
+    std::shared_ptr<std::vector<std::string>> qrVec;
+    std::shared_ptr<std::set<int>> qrSet;
+
 };
 
+QueryResult TextQuery::query(const std::string &search) const {
+    std::shared_ptr<std::set<int>> defaultSet;
+    auto lookFor = smap.find(search);
+    if (lookFor == smap.end()) { return QueryResult(search, svec, defaultSet); }        // return search word, vector, and default-initialized set
+    else { return QueryResult(search, svec, lookFor->second); }                         // return search word, vector, and set of lineNos
+}; 
+
 void runQueries(std::ifstream &infile) {
-   //infile is an ifstream that is the file we want to query
     TextQuery tq(infile);
     while (true) {
-        std::cout << "Enter word to look for, or q to quit: ";
+        std::cout << "Enter a word to look for, or type q to quit: ";
         std::string s;
-        // stop if we hit end-of-file on the input, or if a 'q' is entered
-        if (!(std::cin >> s) || (s == "q")) {
-            break;
-        }
+        if (!(std::cin >> s) || (s == "q")) { break; }
         print(std::cout, tq.query(s)) <<std::endl;
     }
 }
 
-std::ostream &print(std::ostream &os, std::string s) {
- 
-};
+std::ostream &print(std::ostream &os, const QueryResult &q) {
+    os << q.searchedWord << " occurs " << q.qrSet->size() << (q.qrSet->size() > 1 ? " times.\n" : " time.\n");
+    for (auto i : *q.qrSet) {
+        os << "Line " << (i+1) << q.qrVec->at(i) << std::endl;
+    }
+    return os;
+}
+
 
 int main()
 {
