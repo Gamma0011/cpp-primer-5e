@@ -22,7 +22,7 @@ public:
     TextQuery(std::ifstream &ifs) : svec(new std::vector<std::string>) {
         for (std::string line ; std::getline(ifs, line) ; svec->push_back(line)) {
             std::string word;
-            std::vector<std::string>::size_type n = svec->size();
+            std::vector<std::string>::size_type n = svec->size() - 1;
             for(std::istringstream read(line) ; read >> word ; ) { 
                 auto &lines = smap[word];
                 if (!lines) {
