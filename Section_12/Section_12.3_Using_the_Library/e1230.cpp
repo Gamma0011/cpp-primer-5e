@@ -20,10 +20,16 @@ class QueryResult;
 class TextQuery {
 public:
     TextQuery(std::ifstream &ifs) : svec(new std::vector<std::string>) {
-        for (std::string line ; ifs >> line ; svec->push_back(line)) {
+        for (std::string line ; std::getline(ifs, line) ; svec->push_back(line)) {
             std::string word;
-            int n = svec->size() - 1;
-            for(std::istringstream read(line) ; read >> word ; smap[word]->insert(n) ) { }
+            std::vector<std::string>::size_type n = svec->size();
+            for(std::istringstream read(line) ; read >> word ; ) { 
+                auto &lines = smap[word];
+                if (!lines) {
+                    lines.reset(new std::set<std::vector<std::string>::size_type>);
+                } 
+                lines->insert(n);
+            }
         }
     }
     QueryResult query(const std::string &) const;
@@ -46,7 +52,7 @@ private:
 };
 
 QueryResult TextQuery::query(const std::string &s) const {
-    std::shared_ptr<std::set<std::vector<std::string>::size_type>> defaultSet;
+    std::shared_ptr<std::set<std::vector<std::string>::size_type>> defaultSet(new std::set<std::vector<std::string>::size_type>);
     auto lookup = smap.find(s);
     if (lookup == smap.end()) { 
         return QueryResult(s, svec, defaultSet);
@@ -93,7 +99,6 @@ int main(/*int argi, char **argc*/)
         std::cerr << "ERROR: No file." <<std::endl;
         return -1;
     }
-
 
     return 0;
 }
