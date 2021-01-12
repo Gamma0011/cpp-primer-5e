@@ -22,7 +22,7 @@ public:
     TextQuery(std::ifstream &ifs) : svec(new std::vector<std::string>) {
         for (std::string line ; std::getline(ifs, line) ; svec->push_back(line)) {
             std::string word;
-            std::vector<std::string>::size_type n = svec->size() - 1;
+            std::vector<std::string>::size_type n = svec->size();
             for(std::istringstream read(line) ; read >> word ; ) { 
                 auto &lines = smap[word];
                 if (!lines) {
@@ -64,7 +64,7 @@ QueryResult TextQuery::query(const std::string &s) const {
 std::ostream &print(std::ostream &os, const QueryResult &qr) {
     os << qr.word << " occurs " << qr.qrs->size() << make_plural(qr.qrs->size(), " time", "s");
     for (auto &line : *qr.qrs) {
-        os << "line " << line + 1 << " : "
+        os << "\nline " << line + 1 << " : "
            << *(qr.qrvec->begin() + line) << std::endl;
     }
 
