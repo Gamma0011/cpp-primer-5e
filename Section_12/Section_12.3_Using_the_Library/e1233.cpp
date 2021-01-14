@@ -9,7 +9,9 @@
 #include <set>
 
 /*
-    e12.32  - Rewrite TextQuery and QueryResult classes to use a StrBlob instead of a vector<string> to hold the input file.
+    e12.33  - In chapter 15, we'll extend our query system and will need some additional members in QueryResult class. 
+                    - Add members named begin and end that return iterators into the set of line numbers returned by a given query
+                    - A member named get_file that returns a shared_ptr to the file in the QueryResult object
 */
 
 class QueryResult;
@@ -62,6 +64,14 @@ public:
                 const StrBlob &tsb,
                 std::shared_ptr<std::set<std::vector<std::string>::size_type>> tqrs) :
                 word(s), qrsb(tsb), qrs(tqrs) { };
+
+    // begin and end that return iterators into the set of line numbers returned by a given query
+    std::set<std::vector<std::string>::size_type>::iterator begin() { return qrs->begin(); }
+    std::set<std::vector<std::string>::size_type>::iterator end() { return qrs->end(); }
+
+    // A member named get_file that returns a shared_ptr to the file in the QueryResult object
+    std::shared_ptr<StrBlob> get_file() { return std::make_shared<StrBlob>(qrsb); }
+
 private:
     std::string word;
     StrBlob qrsb;
