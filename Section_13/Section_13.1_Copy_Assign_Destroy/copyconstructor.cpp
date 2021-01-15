@@ -43,6 +43,29 @@
             
             When we use COPY INITIALIZATION, we are asking the compiler to copy the right-hand operand into the object being
              created, converting that object if necessary.
+
+            Sometimes, if a class has a move constructor, copy initialization may use that instead.
+
+            COPY INITIALIZATION also occurs when:
+                - An object is passed as an argument to a parameter of a nonreference type.             void pass(Sales_data sd)    | sd copy-initialized
+                - An object is returned from a function that has a nonreference type.                   return sd                   | sd copy-initialized
+                - Elements are brace-initialized in an array or the members of an aggregate class.      {1,2,3,4,5,6}               | copy initialized
+            
+            .insert() or .push() members copy initialize their elements, where as .emplace() direct initializes them.
+
+        | CONSTRAINTS ON COPY INITIALIZATION |
+            Whether we use copy or direct initialization matters if we use an initializer that requires conversion
+             by an explicit constructor.
+
+            vector<int> v1(10);             // ok: direct initialization
+            vector<int> v2 = 10;            // error: constructor that takes a size is explicit
+            void f(vector<int>);            // f's parameter is copy initialized
+            f(10);                          // error: can't use an explicit constructor to copy an argument
+            f(vector<int>(10));             // ok: directly construct a temp vector from int
+
+        **NOTE** The compiler can bypass the copy constructor to write the object directly. However, it is not obligated to do so.
+            Even if the compiler omits the call to copy/move constructor, the constructors must still exist and be accessible (not private).
+
 */
 
 class Sales_data {
