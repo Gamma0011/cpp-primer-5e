@@ -45,13 +45,75 @@
     
     e13.6   - What is a copy-assignment operator? When is the operator used? What does the synthesized copy-assignment operator do? When is it synthesized?
                 Copy-assignment operator - controls how objects of the class as assigned. Denoted by returning a reference to the class and using operator= function
-                Operator is used
+                Operator is used to tell the compiler how objects of the same class should be copied.
+                The copy-assignment operator is synthesized when no operator is defined in the code.
+
+    e13.7   - What happens when we assign on StrBlob to another? What about StrBlobPtrs?
+                Both will use synthesized constructors since there is no copy-assignment operator defined within the classes.
+                The operators will look like this:
+
+                    StrBlob(const Strblob&);                    // copy constructor
+                    StrBlob& operator=(StrBlob &orig) {
+                        data = orig.data;                       // new data increases the usage count of orig.data
+                        return *this;
+                    }
+
+                    StrBlobPtr(const StrBlobPtr&);              // copy constructor
+                    StrBlobPtr& operator=(StrBlobPtr &orig) {
+                        wptr = orig.wptr;                       // copied, but usage count does not increase
+                        curr = orig.curr;                       // orig.curr copied to new curr
+                        return *this;
+                    }
+
+    e13.8   - Write the assignment operator for the HasPtr class from 13.5. As with the copy constructor, your assignment 
+                operator should copy the object to which ps points.
+
+                HasPtr& operator=(const HasPtr &orig) {
+                    if (this != orig) {
+                        std::string *ts = new std::string(*orig.ps);
+                        ps = ts;
+                        i = orig.i;
+                    }
+                    return *this;
+                }
+
+    e13.9   - What is a destructor? What does the synthesized destructor do? When is a destructor synthesized?
+                Destructor frees resources of a class and any nonstatic data members of the destroyed object.
+                Synthesized destructor provides a (usually empty) function prior to the memberwise destruction phase. In some cases.
+                 the synthesized destructor my disallow destruction.
+                A destructor is synthesized when no destructor is created in the code.
+    
+    e13.10  - What happens when a StrBlob object is destroyed? What about a StrBlobPtr?
+                StrBlob -  the shared_ptr is deleted and the usage_count decremeneted. If usage_count == 0, memory is freed.
+                StrBlobPtr  - the weak_ptr is destroyed, but no change to usage_count.
+
+    e13.11  - Add a destructor to your HasPtr class from the previous exercises.
+                ~HasPtr() { };
+
+    e13.12  - How many destructor calls occur in the following code fragment?
+
+                bool fcn(const Sales_data *trans, Sales_data accum) {
+                    Sales_data item1(*trans), item2(accum);
+                    return item1.isbn() != item2.isbn();
+                }
+
+                3 times - Destructor called on accum, item1, and item2.
 
 */
 
 class HasPtr {
 public:
     HasPtr(const HasPtr &h) : ps(new std::string(*h.ps)), i(h.i) { };
+    HasPtr& operator=(const HasPtr &orig) {
+        if (this != &orig) {
+            std::string *temp = new std::string(*orig.ps);
+            ps = temp;
+            i = orig.i;
+        }
+        return *this;
+    }
+    ~HasPtr() { };
+
     HasPtr(const std::string &s = std::string()) : ps(new std::string(s)), i(0) { };
 private:
     std::string *ps;
