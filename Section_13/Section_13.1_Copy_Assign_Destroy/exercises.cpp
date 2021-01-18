@@ -129,7 +129,59 @@
                         void e1314();
                         void e1315();
 
+    e13.18  - Define an Employee class that contains an employee name and a unique employee ID. Give the class
+                a default constructor and a constructor that takes a string representing the name. Each constructor 
+                should generate a unique ID by incrementing a static data member.
+
+    e13.19  - Does your Employee class need to define its own version of the copy-control members? If so, why? If not, why not?
+                Implement the members it needs.
+
+                No reason to define as there's no need to copy since we'd want to keep the name info and unique ID, not reset it.
+
+    e13.20  - Explain what happens when we copy, assign or destroy objects of our TextQuery and QueryResult Classes.
+
+                TextQuery:  std::shared_ptr<std::vector<std::string>> svec;
+                            std::map<std::string, std::shared_ptr<std::set<int>>> smap;
+
+                            Copy -  pointer to svec - usage counter increments
+                                    map and elements recreated, pointer to shared_ptr of each value, usage counter increments
+                            Assign - svec (copied) shares a pointer to the elements of the original svec.
+                                    map and key (strings) are copied, but values share pointer to elements of original ints
+                            Destructor - svec usage counter decrements. counter < 1 ? delete.
+                                         shared_ptr values counter decrement, count < 1 ? delete. Strings are then deleted and map deleted.
+
+                QueryResult:    std::string searchedWord;
+                                std::shared_ptr<std::vector<std::string>> qrVec;
+                                std::shared_ptr<std::set<int>> qrSet;
+
+                            Copy -  string copied, qrVec and qrSet share pointers to original element. Usage counter increases.
+                            Assign  - new string(old string), qrVec and qrSet receive shared pointers
+                            Destructor - string destroyed, qrVec and qrSet stop pointing to original elements. Usage counter decremenets.
+                                            usage count < 1 ? delete
+
+    e13.21  - Do you think the TextQuery and QueryResult classes need to define their own copy-control members? Why or why not.
+                Both classes do not requirement a non-synthesized copy contructor or copy-assignment member. The default
+                works as-expected and there is no special need to do otherwise.
 */
+
+class Employee {
+public:
+    Employee() = default;
+    Employee(std::string n) : name(n) { ++id; };
+    Employee(const Employee &) = delete;
+    Employee& operator=(const Employee &) = delete; 
+
+    void printinfo() { std::cout << "Name: " << name << " | ID: " << id <<std::endl; }
+
+private:
+    static int id;
+    std::string name;
+};
+
+int Employee::id = 0;
+
+
+
 
 class Numbered {
 public:
