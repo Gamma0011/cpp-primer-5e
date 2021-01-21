@@ -10,14 +10,16 @@
 
 class TreeNode {
 public:
+
+    TreeNode() : value(std::string()), left(nullptr), right(nullptr), count(new int(1)) { };
     TreeNode(const std::string &s,
              TreeNode l,
-             TreeNode r) : value(s), left(new TreeNode(l)), right(new TreeNode(r)), count(1) { };
+             TreeNode r) : value(s), left(new TreeNode(l)), right(new TreeNode(r)), count(new int(1)) { };
 
     TreeNode(TreeNode &tn) : value(tn.value), left(tn.left), right(tn.right) { ++tn.count; };
 
     TreeNode& operator=(TreeNode &tn) {
-        ++tn.count;
+        ++*tn.count;
         if (--count == 0) {
             delete left;
             delete right;
@@ -30,7 +32,7 @@ public:
     }
 
     ~TreeNode() {
-        if (--count == 0) {
+        if (--*count == 0) {
             delete left;
             delete right;
         }
@@ -38,7 +40,7 @@ public:
 
 private:
     std::string value;
-    int count;
+    int *count;
     TreeNode *left;
     TreeNode *right;
 };
@@ -46,7 +48,16 @@ private:
 class BinStrTree {
 public:
     BinStrTree(TreeNode r) : root(new TreeNode(r)) { };
-    BinStrTree(const BinStrTree &b) : root(new TreeNode(b)) { };
+    BinStrTree(const BinStrTree &b) : root(b.root) { };
+    BinStrTree& operator=(const BinStrTree &b) {
+        auto temp = new TreeNode(*b.root);
+        delete root;
+        root = temp;
+        return *this;
+    };
+    ~BinStrTree() {
+        delete root;
+    }
 
 
 private:
