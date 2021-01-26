@@ -90,6 +90,9 @@ private:
     std::string *cap;       // pointer to one past end of array
 };
 
+// alloc must be defined in the StrVec implementation file
+std::allocator<std::string> StrVec::alloc;
+
 /***************** StrVec COPY-CONTROL MEMBERS *****************/
 StrVec::StrVec(const StrVec &s) {
     // call alloc_n_copy to allocate exactly as many elements as in s

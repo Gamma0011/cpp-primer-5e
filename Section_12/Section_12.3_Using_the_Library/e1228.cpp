@@ -51,7 +51,7 @@ int main(int argi, char **argc)
     std::ifstream open("test.txt");
 
     std::vector<std::string> svec;
-    std::map<std::string, std::set<int>> smap;w
+    std::map<std::string, std::set<int>> smap;
 
     if (open) {
         svec = createVec(open);

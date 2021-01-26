@@ -1,26 +1,17 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <utility>
 #include <memory>
+#include <new>
+#include <map>
+#include <set>
 
-/*
-    e13.39  - write your own version of StrVec, including version of reserve (x), capacity (x), and resize (x);
+// e13.42  - Test your StrVec class by using it in place of the vector<string> in your TextQuery and QueryResults classes.
 
-    e13.40  - Add a constructor that takes an initializer_list<string> to StrVec class
-
-    e13.41  - Why did we use postfix to increment in the call to construct inside push_back? What would happen if we did prefix?
-
-                for (auto i = 0; i != size() ; ++i) { alloc.construct(++dest, std::move(*source++)); }
-
-                *source++ == (*source)++    | dereference source to string, then increment the pointer to next value
-                *++source == *(++source)    | dereference the incremented value. In this case, source + 1 is dereferenced
-
-                *source++ is correct since it'd derefence the value then increment to the next pointer to move into dest.
-    
-    e13.42  - Test your StrVec class by using it in place of the vector<string> in your TextQuery and QueryResults classes.
-            
-*/
+class QueryResult;
 
 class StrVec {
 public:
@@ -60,6 +51,9 @@ private:
     std::pair<std::string*, std::string*> alloc_n_copy
         (const std::string*, const std::string*);
 };
+
+// alloc must be defined in the StrVec implementation file
+std::allocator<std::string> StrVec::alloc;
 
 /***************** StrVec COPY CONTROL *****************/
 
@@ -126,6 +120,82 @@ StrVec::alloc_n_copy(const std::string *b, const std::string *e) {
     auto dest = alloc.allocate(e-b);
     return {dest, std::uninitialized_copy(b, e, dest)};
 }
+
+// function prototyping
+std::string make_plural(std::size_t, const std::string &, const std::string &);
+
+class TextQuery {
+public:
+    TextQuery(std::ifstream &ifs) : svec(new std::vector<std::string>) {
+        for (std::string line ; std::getline(ifs, line) ; svec->push_back(line)) {
+            std::string word;
+            std::vector<std::string>::size_type n = svec->size();
+            for(std::istringstream read(line) ; read >> word ; ) { 
+                auto &lines = smap[word];
+                if (!lines) {
+                    lines.reset(new std::set<std::vector<std::string>::size_type>);
+                } 
+                lines->insert(n);
+            }
+        }
+    }
+    QueryResult query(const std::string &) const;
+private:
+    StrVec sv;
+    std::shared_ptr<std::vector<std::string>> svec;
+    std::map<std::string, std::shared_ptr<std::set<std::vector<std::string>::size_type>>> smap;
+};
+
+class QueryResult {
+    friend std::ostream &print(std::ostream &, const QueryResult &);
+public:
+    QueryResult(const std::string &w,
+                std::shared_ptr<std::vector<std::string>> v,
+                std::shared_ptr<std::set<std::vector<std::string>::size_type>> s) :
+                word(w), qrvec(v), qrs(s) { };
+private:
+    std::string word;
+    std::shared_ptr<std::vector<std::string>> qrvec;
+    std::shared_ptr<std::set<std::vector<std::string>::size_type>> qrs;
+};
+
+QueryResult TextQuery::query(const std::string &s) const {
+    std::shared_ptr<std::set<std::vector<std::string>::size_type>> defaultSet(new std::set<std::vector<std::string>::size_type>);
+    auto lookup = smap.find(s);
+    if (lookup == smap.end()) { 
+        return QueryResult(s, svec, defaultSet);
+    } else {
+        return QueryResult(s, svec, lookup->second);
+    }
+}
+
+std::ostream &print(std::ostream &os, const QueryResult &qr) {
+    os << qr.word << " occurs " << qr.qrs->size() << make_plural(qr.qrs->size(), " time", "s");
+    for (auto &line : *qr.qrs) {
+        os << "\nline " << line + 1 << " : "
+           << *(qr.qrvec->begin() + line) << std::endl;
+    }
+
+    return os;
+};
+
+std::string make_plural(std::size_t sz, const std::string &w, const std::string &p) {
+    return (sz > 1 ? (w + p) : w);
+}
+
+void runQueries(std::ifstream &inFile) {
+    TextQuery tq(inFile);
+    while(true) {
+        std::cout << "Enter a word to look for, or q to quit: ";
+        std::string s;
+        if(!(std::cin >> s) || s == "q") {
+            break;
+        } else {
+            print(std::cout, tq.query(s)) <<std::endl;
+        }
+    }
+}
+
 
 int main()
 {
