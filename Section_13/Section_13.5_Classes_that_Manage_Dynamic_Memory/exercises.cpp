@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <algorithm>
 
 /*
     e13.39  - write your own version of StrVec, including version of reserve (x), capacity (x), and resize (x);
@@ -20,6 +21,26 @@
     
     e13.42  - Test your StrVec class by using it in place of the vector<string> in your TextQuery and QueryResults classes.
             
+    e13.43  - Rewrite the free member to use for_each and a lambda in place of the for loop to destroy the elements. Which implementation
+                do you prefer?
+
+                I prefer using the lambda because there's no need to iterate backwards. I also think it reads a bit more clearly than using a for statement
+
+                void StrVec::free() {
+                    if (beg) {
+                        for ( auto e = lelem; e != beg; ) {
+                            alloc.destroy(--e);
+                        }
+                    }
+                alloc.deallocate(beg, cap - beg);
+                }
+
+                void StrVec::free() {
+                    if(beg) {
+                        for_each(beg, lelem, [](const auto &sptr){alloc.destroy(sptr); });
+                        alloc.deallocate(beg, cap-beg);
+                    }
+                }
 */
 
 class StrVec {
@@ -111,7 +132,7 @@ void StrVec::reallocate() {
     cap = beg + sz;         // beg element + size of elements allocated
 
 }
-
+/*
 void StrVec::free() {
     if (beg) {
         for ( auto e = lelem; e != beg; ) {
@@ -119,6 +140,13 @@ void StrVec::free() {
         }
     }
     alloc.deallocate(beg, cap - beg);
+}
+*/
+void StrVec::free() {
+    if(beg) {
+        for_each(beg, lelem, [](const auto &sptr){alloc.destroy(sptr); });
+        alloc.deallocate(beg, cap-beg);
+    }
 }
 
 std::pair<std::string*, std::string*> 
