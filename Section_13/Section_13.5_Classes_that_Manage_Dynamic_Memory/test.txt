@@ -1,0 +1,9 @@
+this is a text file
+that we will use to
+test
+whether or not
+e1342.cpp works as expected
+hello
+world
+hello world!
+hello
