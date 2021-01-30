@@ -26,6 +26,7 @@ class String {
 		String(const String &);
 		String& operator=(const String &);
 		String(String &&) noexcept;
+		String& operator=(String &&) noexcept;
 		~String() { free(); }
 		void push_back(const char &);
 		void pop_back();
@@ -83,6 +84,19 @@ String::String(String &&s) noexcept         // won't throw any exceptions
     : elements(s.elements), first_free(s.first_free), cap(s.cap) {
     // leave s in a state in which it is safe to run destructor
     s.elements = s.first_free = s.cap = nullptr;
+}
+
+String&
+String::operator=(String &&rhs) noexcept {
+    if (this != &rhs) {
+        free();                     // free existing elements
+        elements = rhs.elements;    // take over resources from rhs
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        // leave rhs in destructible state.
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
+    return *this;
 }
 
 // member functions

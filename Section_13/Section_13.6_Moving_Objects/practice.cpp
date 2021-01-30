@@ -111,6 +111,103 @@
                     C::C(C &&c) noexcept : {};
 
             Move constructors and move assignment operators that cannot throw exceptions should be marked as such - noexcept
+
+            Adding noexcept tells the compiler that there is no chance that the called operation will throw an exception, causing
+             the operation not to complete in its entirety. Failing to declare noexcept on the std::move, the compiler will automatically
+             use the copy constructor/copy-assignment operation instead.
+
+        | MOVE-ASSIGNMENT OPERATOR |
+            The move-assignment operator does the same work as the destructor and the move constructor.
+             Our move-assignment operator won't throw any exceptions and should be made noexcept and, like copy-assignment operator, 
+             it must guard against self-assignment.
+
+            StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
+                if (this != &rhs) {
+                    free();                     // free existing elements
+                    elements = rhs.elements;    // take over resources from rhs
+                    first_free = rhs.first_free;
+                    cap = rhs.cap;
+                    // leave rhs in destructible state.
+                    rhs.elements = rhs.first_free = rhs.cap = nullptr;
+                }
+                return *this;
+            }
+        
+        | A MOVED-FROM OBJECT MUST BE DESTRUCTIBLE |
+            Moving from an object does not always destroy that object immediately. Therefore, it is important
+             that the moved-from object is in a state where the destructor can run, by keeping the object valid.
+
+            **NOTE** Although a moved-from object is valid, make no assumptions about its value.
+        
+        | THE SYNTHESIZED MOVE OPERATIONS |
+            The compiler will synthesize the move constructor and move-assignment operator. However, the conditions under
+             which it synthesizes are different than those under which it synthesizes copy operators.
+
+            For some classes, the compiler does not synthesize move operations at all. In particular, if the class defines
+             its own copy constructor, copy-assignment operator, or destructor, the move constructor and move-assignment operator
+             are not synthesized. Then a class does not have a move operation, the corresponding copy operation is used in place of
+             move through normal function matching.
+            
+            **NOTE**
+            The compiler will synthesize a move constructor or a move-assignment operator, only if the class doesn't define 
+             its own copy-control members and if every nonstatic data member of the class can be moved. Members of built-in type can be moved.
+             Additionally, the compiler can move members of class type if member's class has corresponding move operation
+
+             struct X {
+                 int i;         // built-in type can be moved
+                 std::string s; // string defines own move operations
+             };
+             struct hasX {
+                 X mem;         // X has synthesized move operations
+             };
+             X x, x2 = std::move(x);            // uses synthesized move constructor
+             hasX hx, hx2 = std::move(hx);      // uses synthesized move constructor
+
+            A move operation is never implicitly defined as a deleted function. However, if we explicitly ask the compiler to generate
+             a move operation by using = default, and the compiler is unable to move all members. The operation will be defined as delete.
+
+                Rules for when synthesized move operation is defined as deleted:
+                    - If class has a member that defines its own copy constructor but does not define a move constructor
+                    - Class has member that does not define its own copy operations and compiler unable to synthesize move constructor.
+                    - Class has a member whose own move constructor or move-assignment operator is deleted or inaccessible.
+                    - Move constructor defined as deleted if destructor deleted or inaccessible.
+                    - If class has a const or & member.
+
+                // Y is a class with its own copy constructor, but no move constructor
+                struct hasY {
+                    hasY() = default
+                    hasY(hasY&&) = default;
+                    Y mem;                      // hasY will have deleted move constructor. Data member Y does not have a move constructor
+                };
+
+                hasY hy, hy2 = std::move(hy);   // error: move constructor deleted
+
+            **NOTE** Classes that define a move constructor or move-assignment operator must also define their own copy operations. If not,
+             those members are deleted by default.
+
+        | RVALUE ARE MOVED, LVALUES ARE COPIED |
+            When a class has both move and copy operations, the compiler uses function mation to determine which to use.
+
+            StrVec v1, v2;
+            v1 = v2;                    // v2 lvalue, copy assignment. rvalue reference cannot implicitly bind to lvalue
+            StrVec getVec(istream &);   // getVec returns rvalue
+            v2 = getVec(cin);           // getVec(cin) is an rvalue return, move assignment.
+
+            In cases where there is a copy constructor, but no move constructor, function matching will use the copy operations.
+                Rvalue return (&&) can be converted to a const.
+
+            class Foo {
+            public:
+                Foo() = default;
+                Foo(const Foo&);        // copy constructor
+            };
+
+            Foo x;
+            Foo y(x);               // copy constructor
+            Foo z(std::move(x));    // copy constructor. move constructor doesn't exist
+
+            *NOTE* If a class has a usable copy constructor and no move constructor, objects will be "moved" by copy constructor.
+
 */
 
 void lrval() {
@@ -132,11 +229,29 @@ void moveFunction() {
     int &&rr2 = std::move(rr1);
 }
 
+struct Y {
+    Y() = default;
+    Y(const Y&): i(0) { };
+
+    int i;
+};
+
+struct hasY {
+    hasY() = default;
+    hasY(hasY&&) = default;
+    Y mem;                  // Object of Y has no move constructor, therefore, move constructor deleted
+};
+
+void testMoveConstructor() {
+    hasY y1, y2 = std::move(y1);
+}
 
 int main()
 {
-    lrval();
-    moveFunction();
+    //lrval();
+    //moveFunction();
+    testMoveConstructor();
+
 
     return 0;
 }
