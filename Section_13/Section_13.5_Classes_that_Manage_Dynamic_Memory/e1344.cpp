@@ -14,7 +14,7 @@
                 This problem was difficult -- credit for solution goes to u/fsaadatmand
                     https://github.com/fsaadatmand/Cpp-Primer/blob/master/chapter13/13.44.cpp
 */
-
+ 
 class String {
 	friend std::ostream& print(std::ostream &, const String &);
 	public:

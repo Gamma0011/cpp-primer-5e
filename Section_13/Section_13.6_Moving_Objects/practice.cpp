@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include "strClass.h"
 
 /*
     || MOVING OBJECTS ||
@@ -71,6 +72,45 @@
                 
                 *NOTE* We can destroy a moved-from object and can assign a new value to it, but we cannot use the value of a moved-from object.
 
+        | MOVE CONSTRUCTOR AND MOVE ASSIGNMENT |
+            In addition to copy constructors and copy-assignment operators, we can also define move constructors and move-assignment operators. 
+             These function by "stealing" resources from their given object rather than copying them.
+            
+            The move constructor must ensure that the moved-from object is left in a state such that destroying the object will be harmless.
+             Once resources are moved, the original object must no longer point to those moved resources.
+            
+            StrVec::StrVec(StrVec &&s) noexcept         // won't throw any exceptions
+                // member initializers take over the resources in s
+                : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+                    // leave s in a state in which it is safe to run destructor
+                    s.elements = s.first_free = s.cap = nullptr;
+                }
+
+            Unlike the copy constructor, the move constructor does not allocate any new memory; it takes over memory
+             frm the given StrVec. Having taken over the memory, the constructor body sets the pointers in the given object to
+             nullptrs. Eventually, the moved-from object (s) will be destroyed. Not changing s.first_free or any other member data
+             to nullptr would delete the memory just moved.
+
+                Steps: &&s rvalue to object s, ownership moved to new object calling move constructor, once ownership moved, reset
+                        memory so that memory can be deleted. Once deleted, new object has ownership of members of old object.
+        
+        | MOVE OPERATIONS, LIBRARY CONTAINERS, EXCEPTIONS |
+            Move operations normally do not allocate resources. As a result, the move operations will not throw any exceptions.
+             When we write a move operation that cannot throw, we should inform the library of the fact, by declaring noexcept
+             If we don't, it'll do extra work to cater to the possibility that moving an object of our class type might throw.
+
+             noexcept is a way for us to promise that the function does not throw any exceptions.
+             In a function, no except exists after the parameters, in a constructor, it exists between the paramters and initializer list
+
+            **NOTE** we must specify noexcept on both declaration in the class header and on the defintion, if that definition appears
+            outside of the class 
+                ex.
+                    class C{
+                        C(C&&) noexcept;
+                    };
+                    C::C(C &&c) noexcept : {};
+
+            Move constructors and move assignment operators that cannot throw exceptions should be marked as such - noexcept
 */
 
 void lrval() {
