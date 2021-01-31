@@ -17,6 +17,8 @@ public:
     explicit Message(const std::string &str = "") : contents(str) { };          // default constructor
     Message(const Message&);                            // copy constructor
     Message& operator=(const Message&);                 // copy-assignment operator
+    Message(Message&&);                                 // move constructor
+    Message& operator=(Message &&);                     // move-assignment operator
     ~Message();                                         // destructor
 
     // add/remove this Message from the specified Folder's set of messages
@@ -25,6 +27,8 @@ public:
 
     void addFolder(Folder*);            // add pointer to folder
     void remFolder(Folder*);            // remove pointer to folder
+
+    void move_Folders(Message*);
 
 private:
     std::string contents;               // actual message text
@@ -67,11 +71,26 @@ Message& Message::operator=(const Message &rhs) {
     folders = rhs.folders;          // copy Folder pointers
     add_to_Folders(rhs);            // add this Message to those Folders
     return *this;
-
 } 
 
-Message::~Message() { remove_from_Folders(); }
+/************ MESSAGES MOVE CONTROL ************/
 
+Message::Message(Message &&m) : contents(std::move(m.contents)) {
+    move_Folders(&m);               // moves folders and updates the Folder pointers
+}
+
+Message& Message::operator=(Message &&rhs) {
+    if (this != &rhs) {                     // direct check for self-assignment
+        remove_from_Folders();              // destroy old state of lhs operand (Message&)
+        contents = std::move(rhs.contents); // execute move command
+        move_Folders(&rhs);                 // reset the Folders to point to this Message
+    }
+    return *this;
+}
+
+/************ DESTRUCTOR ************/
+
+Message::~Message() { remove_from_Folders(); }
 
 /************ MESSAGES MEMBER FUNCTIONS ************/
 
@@ -82,6 +101,16 @@ void Message::save(Folder &f) {
 void Message::remove(Folder &f) {
     folders.erase(&f);      // take the given Folder out of our list of Folders
     f.remMsg(this);         // remove this Messsage to f's set of Messages
+}
+
+void Message::move_Folders(Message *m) {
+    folders = std::move(m->folders); // set move assignment used
+
+    for (auto f : folders) {    // for each Folder
+        f->remMsg(m);           // remove the old Message from the folder
+        f->addMsg(this);        // add this Message to that folder
+    }
+    m->folders.clear();         // ensure that destroying m is harmless
 }
 
 void Message::add_to_Folders(const Message &m) {

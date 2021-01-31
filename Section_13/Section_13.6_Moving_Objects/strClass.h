@@ -82,6 +82,7 @@ String::operator=(const String &rhs)
 String::String(String &&s) noexcept         // won't throw any exceptions
     // member initializers take over the resources in s
     : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+	std::cout << "Move Constructor" <<std::endl;
     // leave s in a state in which it is safe to run destructor
     s.elements = s.first_free = s.cap = nullptr;
 }
@@ -96,6 +97,7 @@ String::operator=(String &&rhs) noexcept {
         // leave rhs in destructible state.
         rhs.elements = rhs.first_free = rhs.cap = nullptr;
     }
+	std::cout << "Move Assignment Operator" <<std::endl;
     return *this;
 }
 

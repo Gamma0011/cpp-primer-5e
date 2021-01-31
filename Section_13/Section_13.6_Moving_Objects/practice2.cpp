@@ -30,12 +30,33 @@
             defining a move constructor in these classes can avoid overhead in cases where copies are not needed.
 
         
+    || MOVE ITERATORS ||
+        The new library defines a MOVE ITERATOR adaptor. A move iterator adapts its given iterator by changing the behavior of the iterator's
+         dereference operator. Normally, an iterator dereference operator returns an LVALUE reference to the element. Dereferencing a MOVE
+         ITERATOR returns an RVALUE reference instead.
+
+         From the StrVec example, we can place MOVE ITERATORS in our void reallocate() function.
+            auto last = uninitialized_copy(std::make_move_iterator(begin()), std::make_move_iterator(end()), first);
+
+            Because we've passed move iterators, the dereference operator yields an rvalue reference, which means CONSTRUCT
+            will use move constructor to construct the elements. Because moving the object can destroy the source, you should 
+            only pass move iterators to algorithms when you are confident that the algorithm dos not access an element 
+            after it has assigned to that element or passed that element to a user-defined function.
+
+        || ADVICE: DON'T BE QUICK TO MOVE ||
+            Because a moved-from object has an indeterminate state, calling std::move on an object is a dangerous operation.
+            We MUST be certain there are no other users of the moved-from object. Used within class code, move can offer
+            massive performance benefits. However, using in user code (instead of class implementation code) can lead to 
+            hard-to-find bugs.
+
+            *BEST PRACTICE*
+            Outside of class implementation of code such as move constructors or move-assignment operators, use std::move only
+            when you are certain that you need to do a move and that move is guaranteed to be safe.
 */
 
 
 int main()
 {
-
 
     return 0;
 }
