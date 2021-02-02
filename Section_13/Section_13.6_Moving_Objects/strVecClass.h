@@ -41,7 +41,10 @@ public:
     StrVec& operator=(StrVec &&) noexcept;  // move-assignment operator
     ~StrVec();                          // destructor
 
+    // push_back copy version
     void push_back(const std::string&);
+    // push_back move version
+    void push_back(std::string&&);
 
 private:
     static std::allocator<std::string> alloc;       // used to allocate a block of strings
@@ -93,16 +96,24 @@ StrVec& StrVec::operator=(StrVec &&rhs) noexcept {
     return *this;
 }
 
-/***************** StrVec DEESTRUCTOR *****************/
+/***************** StrVec DESTRUCTOR *****************/
 
 StrVec::~StrVec() {
     free();
 }
 
 /***************** StrVec PUBLIC MEMBER FUNCTIONS *****************/
+
+// push_back copy version
 void StrVec::push_back(const std::string &s) {
     check_n_allocate();                 // check there is space, if none, function calls reallocate();
     alloc.construct(lelem++, s);        // at lelem, insert s
+}
+
+// push_back move version
+void StrVec::push_back(std::string &&s) {
+    check_n_allocate();
+    alloc.construct(lelem++, std::move(s));
 }
 
 /***************** StrVec PRIVATE MEMBER FUNCTIONS *****************/

@@ -95,7 +95,74 @@
 
                 From this, it seems like leaving the copy-and-swap operator or the copy-assignment operator will cause the function matching to match both functions.
                  In this case, the compiler is unsure of which to use and returns an error. It is best in this case to only have one.
+
+    e13.55  - Add an rvalue reference version of push_back to your StrBlob
+                see. strBlobClass.h
+                        void push_back(std::string &&t) { data->push_back(std::move(t)); }
+
+    e13.56  - What would happen if we defined sorted as:
+                Foo Foo::sorted() const & {
+                    Foo ret(*this);
+                    return ret.sorted();
+                }
+
+                This would not work. ret is an lvalue, which means that the ret.sorted() would just call the same sorted const &
+
+    e13.57  - What if we defined sorted as:
+                Foo Foo::sorted() const & {
+                    return Foo(*this).sorted();
+                }
+
+                Foo(*this) returns an rvalue, therefore, the rvalue version of sorted() is called from the lvalue function.
+
+    e13.58  - Write versions of class Foo with print statements in the sorted functions to test your answers
+                see. Class Foo; below
+
 */
+
+class Foo {
+public:
+    friend void print(const Foo&);
+
+    Foo() =  default;               // default constructor
+
+    /*
+    Foo sorted() const & {
+        Foo ret(*this);
+        std::cout << "Should loop until stack exhausted." <<std::endl;      // works as expected
+        return ret.sorted();
+    }
+    */
+    Foo sorted() const & {
+        std::cout << "This will work and call rvalue sorted() to perform the sort" <<std::endl;
+        return Foo(*this).sorted();
+    }
+    /*
+    Foo sorted() const & {
+        Foo ret(*this);
+        std::sort(ret.vec.begin(), ret.vec.end());
+        return ret;
+    }
+    */
+    Foo sorted() && {
+        std::cout << "Rvalue sorted() called." <<std::endl;
+        std::sort(vec.begin(), vec.end());
+        return *this;
+    }
+    void push_back() {
+        int i;
+        while (std::cin >> i && i != 0) { vec.push_back(i); }
+    }
+private:
+    std::vector<int> vec;
+};
+
+void print(const Foo &f) {
+    for (auto i : f.vec) {
+        std::cout << i <<std::endl;
+    }
+}
+
 int f() { return 1; }
 
 void e1346() {
@@ -127,12 +194,20 @@ void e1348() {
 void e1354() {
     HasPtr hp1("hp1"), hp2("hp2"), hp3("hp3");
 
-    hp2 = hp1;
+    // hp2 = hp1;
+}
+
+void e1356() {
+    Foo f1;
+    f1.push_back();
+    print(f1.sorted());
+
 }
 
 int main()
 {
-    e1348();
+    //e1348();
+    e1356();
 
     return 0;
 }
