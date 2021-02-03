@@ -35,7 +35,7 @@ using std::istream;
     e738 - we might want to supply cin as a default argument to the constructor that takes an istream&. Write the constructor declaration that uses cin as a default argument
 
     e739 - would it be legal for both the constructor that takes a string and the one that takes an istream & to have default arguments?
-         This would be illegal because overloaded call for Sales_data() is ambigious.
+         This would be illegal because overloaded call for Sales_data() is ambiguous.
     
     e740 - Choose one of the following abstractions. Determine what data are needed in the class. Provide an appropriate set of constructors
             Chosen: Vehicle
@@ -47,7 +47,7 @@ using std::istream;
     e743 - create class called NoDefault that has a constructor taking an int, but no default. 
            then create a class C that has a member of type NoDefault. define the default constructor for C
 
-    e744 - is the following declaratio legal, why or why not?
+    e744 - is the following declaration legal, why or why not?
 
             vector<NoDefault> vec(10);
 
@@ -245,7 +245,7 @@ int main()
     //vector<NoDefault> vec(10);
     vector<C> vec(10);
 
-   string null_isbn("9-999-99999-9");          // direct initilization of string null_isbn;
+   string null_isbn("9-999-99999-9");          // direct initialization of string null_isbn;
         Sales_data item1(null_isbn);                // explicit conversion from string to type Sales_data
         Sales_data item2("9-999-99999-9");          // implicit conversion of string to Sales_data type
 
