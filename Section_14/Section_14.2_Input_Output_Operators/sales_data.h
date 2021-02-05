@@ -6,6 +6,8 @@
 
 class Sales_data{
 public:
+    friend std::istream& operator>>(std::istream&, Sales_data&);
+
     Sales_data() = default;
     Sales_data(std::string bn, unsigned us, double r) : bookNo(bn), units_Sold(us), revenue(r) { };
 

@@ -60,6 +60,7 @@ public:
     */
     // e742 - rewritten using delegating constructors
     friend std::ostream &print(std::ostream &os, const Vehicle &v);
+    friend std::ostream& operator<<(std::ostream &, const Vehicle &);
 
     Vehicle(unsigned y, std::string mcfr, std::string mk, double mi): year(y), manufacturer(mcfr), make(mk), mileage(mi) { }        // delegated constructor
 
