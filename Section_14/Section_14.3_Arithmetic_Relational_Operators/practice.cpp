@@ -32,6 +32,22 @@
 
             *NOTE* Classes for which there is a logical meaning for equality normally should define operator==.
 
+        | RELATIONAL OPERATORS |
+            Classes for which the equality and inequality is defined also often have relational operators. In particular,
+             this is because the associative containers and some of the algorithms use the less-than operator, it can be 
+             useful to define an operator<.
+
+            The operators should:
+            1) Define an ordering relation that is consistent with the requirements for use as a key to an associative container
+            2) Define a relation that is consistent with == if the class has both operators. In particular if 
+                two objects !=, one should be < the other.
+
+            For our Sales_data class, there is no particular object that logically makes sense to compare for <, therefore, even though
+             we have defined == and !=, we shouldn't define <
+
+            *Note* If a single logical definition for < exists, classes should define the < operator. If the class has ==, define <
+                 * only if the definitions of < and == yield consistent results. 
+
 */
 
 bool operator==(const Sales_data &lhs, const Sales_data &rhs) {

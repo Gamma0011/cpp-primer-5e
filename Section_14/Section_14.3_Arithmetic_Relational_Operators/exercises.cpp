@@ -27,6 +27,12 @@
 
     e14.17  - Should the class you chose for 7.30 define the equality operators? Define
 
+    e14.18  - Define relational operators for your StrBlob, StrBlobPtr, StrVec and String classes
+
+    e14.19  - Should the class you chose for exercise 7 implement relational operators? Why or why not?
+                Relational operators could be used, but based upon the parameters of the class, there's no clear logic for how best to compare.
+                As a result, it would be best to leave the class without relational operators. 
+
 */
 
 Sales_data
@@ -44,11 +50,18 @@ Sales_data::operator-=(const Sales_data &rhs) {
 }
 
 // StrBlob equality/inequality
-bool operator==(const StrBlob &lhs, const StrBlob &rhs);
+bool operator==(const StrBlob &lhs, const StrBlob &rhs) { return lhs.data == rhs.data; }
+bool operator!=(const StrBlob &lhs, const StrBlob &rhs) { return !(lhs==rhs); }
+// StrBlob relational operators
+bool operator<(const StrBlob &lhs, const StrBlob &rhs) { return lhs.data->size() < rhs.data->size(); }
+bool operator>(const StrBlob &lhs, const StrBlob &rhs) { return lhs.data->size() > rhs.data->size(); }
 
 // StrBlobPtr equality/inequality
 bool operator==(const StrBlobPtr &lhs, const StrBlobPtr &rhs) { return lhs.deref() == rhs.deref(); }
 bool operator!=(const StrBlobPtr &lhs, const StrBlobPtr &rhs) { return !(lhs == rhs); }
+// StrBlobPtr relational operators
+bool operator<(const StrBlobPtr &lhs, const StrBlobPtr &rhs) { return lhs.deref().size() < rhs.deref().size(); }
+bool operator>(const StrBlobPtr &lhs, const StrBlobPtr &rhs) { return lhs.deref().size() > rhs.deref().size(); }
 
 // StrVec equality/inequality
 bool operator==(const StrVec &lhs, const StrVec &rhs) {
@@ -63,10 +76,12 @@ bool operator==(const StrVec &lhs, const StrVec &rhs) {
     }
     return true;
 }
-
 bool operator!=(const StrVec &lhs, const StrVec &rhs) {
     return !(lhs == rhs);
 }
+// StrVec relational operators
+bool operator<(const StrVec &lhs, const StrVec &rhs) { return (lhs.cap - lhs.beg) < (rhs.cap - rhs.beg); }
+bool operator>(const StrVec &lhs, const StrVec &rhs) { return (lhs.cap - lhs.beg) > (rhs.cap - rhs.beg); }
 
 
 // String equality/inequality
@@ -80,10 +95,11 @@ bool operator==(const String &lhs, const String &rhs) {
     }
     return true;
 }
+bool operator!=(const String &lhs, const String &rhs) { return !(lhs == rhs); }
+// String relational operators
+bool operator<(const String &lhs, const String &rhs) { return lhs.size() < rhs.size(); }
+bool operator>(const String &lhs, const String &rhs) { return lhs.size() > rhs.size(); }
 
-bool operator!=(const String &lhs, const String &rhs) {
-    return !(lhs == rhs);
-}
 
 // Vehicle class Equality Operators
 bool operator==(const Vehicle &lhs, const Vehicle &rhs) {

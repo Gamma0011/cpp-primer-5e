@@ -15,6 +15,8 @@
 class StrVec {
     friend bool operator==(const StrVec&, const StrVec&);
     friend bool operator!=(const StrVec&, const StrVec&);
+    friend bool operator<(const StrVec&, const StrVec&);
+    friend bool operator>(const StrVec&, const StrVec&);
 public:
     std::size_t size() { return cap - beg; }                        // total memory allocated
     std::size_t capacity() { return cap - lelem; }                  // space remaining
@@ -43,6 +45,8 @@ public:
     StrVec& operator=(StrVec &&) noexcept;  // move-assignment operator
     ~StrVec();                          // destructor
 
+    StrVec& operator=(std::initializer_list<std::string>); 
+
     // push_back copy version
     void push_back(const std::string&);
     // push_back move version
@@ -63,6 +67,16 @@ private:
 
 // alloc must be defined in the StrVec implementation file
 std::allocator<std::string> StrVec::alloc;
+
+/***************** StrVec ASSIGNMENT OPERATOR *****************/
+StrVec& StrVec::operator=(std::initializer_list<std::string> il) {
+    // alloc_n_copy allocates space and copies elements from given range.
+    auto data = alloc_n_copy(il.begin(), il.end());
+    free();     // destroy elements in this object and free space
+    beg = data.first;   // update data members to point to the new space;
+    lelem = cap = data.second;
+    return *this;
+}
 
 /***************** StrVec COPY CONTROL *****************/
 

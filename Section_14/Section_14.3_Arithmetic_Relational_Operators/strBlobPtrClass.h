@@ -10,6 +10,8 @@
 class StrBlobPtr {
     friend bool operator==(const StrBlobPtr&, const StrBlobPtr&);
     friend bool operator!=(const StrBlobPtr&, const StrBlobPtr&);
+    friend bool operator<(const StrBlobPtr &, const StrBlobPtr &);
+    friend bool operator>(const StrBlobPtr &, const StrBlobPtr &); 
 public:
     StrBlobPtr() : curr(0) { };                 // default constructor generates a null StrBlobPtr
     StrBlobPtr(StrBlob &a, std::size_t sz = 0) : wptr(a.data), curr(sz) { };

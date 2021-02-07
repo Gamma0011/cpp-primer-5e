@@ -6,9 +6,9 @@
 
 class Sales_data{
     friend std::istream& operator>>(std::istream&, Sales_data&);
-    friend std::ostream& operator<<(std::ostream&, Sales_data&);
+    friend Sales_data& operator+(const Sales_data&, const Sales_data&);
+    friend Sales_data& operator-(const Sales_data&, const Sales_data&);
 public:
-    Sales_data& operator=(const std::string &s);             // assign string to bookNo;
     Sales_data& operator+=(const Sales_data&);
     Sales_data& operator-=(const Sales_data&);
 
@@ -22,9 +22,23 @@ public:
     double revenue = 0;
 };
 
-Sales_data&
-Sales_data::operator=(const std::string &s) {
-    *this = Sales_data(s);
+Sales_data& operator+(const Sales_data &lhs, const Sales_data &rhs) {
+    auto temp = lhs;
+    temp.units_Sold += rhs.units_Sold;
+    temp.revenue += rhs.revenue;
+    return temp;
+}
+
+Sales_data& operator-(const Sales_data &lhs, const Sales_data &rhs) {
+    auto temp = lhs;
+    temp.units_Sold -= rhs.units_Sold;
+    temp.revenue -= rhs.revenue;
+    return temp;
+}
+
+Sales_data& Sales_data::operator+=(const Sales_data &rhs) {
+    units_Sold = rhs.units_Sold;
+    revenue = rhs.revenue;
     return *this;
 }
 
@@ -35,14 +49,5 @@ double Sales_data::avg_price() const {
         return 0; 
     }
 }
-
-
-/*************** NON MEMBER FUNCTIONS ***************/
-std::ostream&
-operator<<(std::ostream &os, const Sales_data &s) {
-    os << s.bookNo << " " << s.revenue << " " << s.units_Sold;
-    return os;
-}
-
 
 #endif

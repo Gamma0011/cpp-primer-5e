@@ -22,6 +22,8 @@ class String {
 	friend std::ostream& print(std::ostream &, const String &);
 	friend bool operator==(const String&, const String&);
 	friend bool operator!=(const String&, const String&);
+	friend bool operator<(const String&, const String&);
+	friend bool operator<(const String&, const String&);
 	public:
 		String() = default;
 		String(const char *);

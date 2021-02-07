@@ -12,6 +12,8 @@ public:
     friend class StrBlobPtr;
     friend bool operator==(const StrBlob&, const StrBlob&);
     friend bool operator!=(const StrBlob&, const StrBlob&);
+    friend bool operator<(const StrBlob&, const StrBlob&);
+    friend bool operator>(const StrBlob&, const StrBlob&);
 
     StrBlob(const StrBlob &sb) : data(std::make_shared<std::vector<std::string>>(*sb.data)) { }; 
     StrBlob& operator=(const StrBlob &sb) {
