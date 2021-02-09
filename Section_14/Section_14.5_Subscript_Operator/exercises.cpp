@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "sales_data.h"
+#include "vehicleClass.h"
 
 /*
     e14.20  - Define the addition and compound-assignment operators for your Sales_data class.
@@ -26,17 +27,35 @@
     
     e14.22  - Define a version of the assignment operator that we can assign a string representing an ISBN to a Sales_data.
                     see. sales_data.h
+    
+    e14.23  - Define an initializer_list assignment operator for your version of the StrVec class.
+                    see. strVecClass.h
 
+    e14.24  - Decide whether the class you used in exercise 7.40 needs a copy- or move-assignment operator.
+                    see. vehicleClass.h
 
-                *need to keep working*
+    e14.25  - Implement any other assignment operators your class should define. Explain.
+
 */
 
-int main()
-{
+void e1422() {
     Sales_data test;
     std::string s("test");
     test = s;
+}
 
+void e1425() {
+    Vehicle t1(1998, "Plymouth", "Neon", 192000);
+    Vehicle t2;
+    std::cout << t1 <<std::endl;
+    std::cout << t2 <<std::endl;
+    t2 = t1;
+    std::cout << t2 <<std::endl;
+}
+
+int main()
+{
+    e1425();
 
     return 0;
 }

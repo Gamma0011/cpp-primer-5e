@@ -45,7 +45,7 @@ public:
     StrVec& operator=(StrVec &&) noexcept;  // move-assignment operator
     ~StrVec();                          // destructor
 
-    StrVec& operator=(std::initializer_list<std::string>); 
+    StrVec& operator=(std::initializer_list<std::string>);
 
     // push_back copy version
     void push_back(const std::string&);
@@ -69,11 +69,12 @@ private:
 std::allocator<std::string> StrVec::alloc;
 
 /***************** StrVec ASSIGNMENT OPERATOR *****************/
-StrVec& StrVec::operator=(std::initializer_list<std::string> il) {
-    // alloc_n_copy allocates space and copies elements from given range.
-    auto data = alloc_n_copy(il.begin(), il.end());
-    free();     // destroy elements in this object and free space
-    beg = data.first;   // update data members to point to the new space;
+
+StrVec&
+StrVec::operator=(std::initializer_list<std::string> il) {
+    auto data = alloc_n_copy(il.begin(), il.end());         // create a set .first == beg, .second == end
+    free();                                                 // free memory used by StrVec&
+    beg = data.first;
     lelem = cap = data.second;
     return *this;
 }
