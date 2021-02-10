@@ -36,6 +36,11 @@
 
     e14.25  - Implement any other assignment operators your class should define. Explain.
 
+    e14.26  - Define subscript operators for StrVec, String, StrBlob, and StrBlobPtr classes.
+                see. strVecClass.h
+                     strClass.h - char& operator[](size_t); const char& operator[](size_t) const;
+                     strBlobClass.h - std::string& operator[](size_t); const std::string& operator[](size_t) const;
+                     strBlobPtrClass.h - 
 */
 
 void e1422() {

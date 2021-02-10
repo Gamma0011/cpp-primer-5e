@@ -17,6 +17,7 @@ class StrVec {
     friend bool operator!=(const StrVec&, const StrVec&);
     friend bool operator<(const StrVec&, const StrVec&);
     friend bool operator>(const StrVec&, const StrVec&);
+    friend std::ostream& operator<<(std::ostream&, const StrVec&);
 public:
     std::size_t size() { return cap - beg; }                        // total memory allocated
     std::size_t capacity() { return cap - lelem; }                  // space remaining
@@ -46,6 +47,8 @@ public:
     ~StrVec();                          // destructor
 
     StrVec& operator=(std::initializer_list<std::string>); 
+    std::string& operator[](std::size_t n) { return beg[n]; }               // subscript operator &
+    const std::string& operator[](std::size_t n) const { return beg[n]; }   // subscript operator const&
 
     // push_back copy version
     void push_back(const std::string&);
@@ -116,6 +119,13 @@ StrVec& StrVec::operator=(StrVec &&rhs) noexcept {
 
 StrVec::~StrVec() {
     free();
+}
+
+/***************** StrVec Output Operator *****************/
+
+std::ostream& operator<<(std::ostream &os, const StrVec &s) {
+    for (auto c = s.beg ; c != s.lelem ; ++c) { os << c << " "; }
+    return os;
 }
 
 /***************** StrVec PUBLIC MEMBER FUNCTIONS *****************/
