@@ -53,7 +53,14 @@
             *NOTE* The int parameter is not used, so we do not give it a name.
 
         | CALLNG THE POSTFIX OPERATORS EXPLICITLY | 
+            We can explicitly call an overloaded operator as an alternative to using it as an operator in an expression.
+             If we want to call the postfix version using a function call, then we must pass a value for the integer argument.
+            
+            ex.     StrBlobPtr p(a1);   // p points to the vector inside a1
+                    p.operator++(0);    // call postfix operator++
+                    p.operator++();     // call prefix operator++
 
+            The value passed usually is ignored, but is necessary in order to tell the compiler to use the postfix version.
 
 */
 

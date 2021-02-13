@@ -8,6 +8,7 @@
 #include "strBlobClass.h"
 
 class StrBlobPtr {
+    friend class PtrStrBlobPtr;
     friend bool operator==(const StrBlobPtr&, const StrBlobPtr&);
     friend bool operator!=(const StrBlobPtr&, const StrBlobPtr&);
     friend bool operator<(const StrBlobPtr &, const StrBlobPtr &);
@@ -20,6 +21,8 @@ public:
 
     std::string& operator[](std::size_t);
     const std::string& operator[](std::size_t) const;
+    std::string& operator*() const;         // dereference operator
+    std::string* operator->() const;        // arrow operator
     std::string& operator+(std::size_t);    // addition pointer arithmetic
     std::string& operator-(std::size_t);    // subtraction pointer arithmetic
     StrBlobPtr& operator++();           // prefix incr
@@ -34,6 +37,29 @@ private:
     std::size_t curr;
 };
 
+// subscript operators
+std::string& StrBlobPtr::operator[](std::size_t n) {
+    auto p = check(n, "Subscript out of Range!");
+    return (*p)[n];
+}
+
+const std::string& StrBlobPtr::operator[](std::size_t n) const {
+    auto p = check(n, "Subscript out of Range!");
+    return (*p)[n];
+}
+
+// dereference operator
+std::string& StrBlobPtr::operator*() const {
+    auto p = check(curr, "Dereference past end");
+    return (*p)[curr];                  // (*p) is the vector to which this object points
+}
+
+// arrow operator
+std::string* StrBlobPtr::operator->() const {
+    // delegate real work to dereference operator
+    return & this->operator*();
+}
+
 // addition pointer arithmetic
 std::string& StrBlobPtr::operator+(std::size_t n) {
     auto e = check(curr+n, "No Element at Position within Vector");
@@ -44,17 +70,6 @@ std::string& StrBlobPtr::operator+(std::size_t n) {
 std::string& StrBlobPtr::operator-(std::size_t n) {
     auto e = check(curr-n, "No Element at Position within Vector");
     return (*e)[curr-n];
-}
-
-// subscript operators
-std::string& StrBlobPtr::operator[](std::size_t n) {
-    auto p = check(n, "Subscript out of Range!");
-    return (*p)[n];
-}
-
-const std::string& StrBlobPtr::operator[](std::size_t n) const {
-    auto p = check(n, "Subscript out of Range!");
-    return (*p)[n];
 }
 
 // PREFIX increment/decrement operators
