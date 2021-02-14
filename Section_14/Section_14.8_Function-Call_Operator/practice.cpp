@@ -28,8 +28,15 @@
             A function-object class can have additional members aside from operator(). Function-object classes
              often contain data members that are used to customize operations in the call operator.
             
-            see. class PtrinString;
+            see. class PrintString;
 
+            Function objects are most often used as arguments to the generic algorithms. For example, we can use the library for_each
+             algorithm and our PrintString class to print contents of a container.
+            
+            std::for_each(vs.begin(), vs.end(), PrintString(std::cerr, '\n'));
+
+                The 3rd argument to for_each is a temporary object of type PrintString that we initialize from cerr and a newline character.
+                The call to for_each will print each element in vs to cerr followed by a newline
 
 
 */
@@ -47,7 +54,7 @@ void checkAbsInt() {
 
 class PrintString {
 public:
-    PrintString(std::ostream &os = std::cout, char c = ' ') :
+    PrintString(std::ostream &o = std::cout, char c = ' ') :
         os(o), sep(c) { };
     void operator()(const std::string &s) const { os << s << sep; }
 private:
@@ -55,9 +62,18 @@ private:
     char sep;               // character to print after each output
 };
 
+void printStringExample() {
+    std::string s("Hello");
+    PrintString printer;    // uses the defaults; prints to cout
+    printer(s);             // prints s followed by a space on cout
+    PrintString errors(std::cerr, '\n');
+    errors(s);              // prints s followed by a newline on cerr
+}
+
+
 int main()
 {
-
+    printStringExample();
 
 
     return 0;
