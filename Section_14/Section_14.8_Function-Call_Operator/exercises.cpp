@@ -25,6 +25,9 @@
 
     e14.37  - Write a class that tests whether two values are equal. Use that object and library algorithms to write a program to replace
                 all instances of a given value in a sequence.
+
+    e14.38  - Write a class that tests whether the length of a given string matches a given bound. Use that object to write a program
+                to report how many words in an input file are of sizes 1 through 10 inclusive
 */
 
 /************ CLASSES ************/

@@ -38,7 +38,54 @@
                 The 3rd argument to for_each is a temporary object of type PrintString that we initialize from cerr and a newline character.
                 The call to for_each will print each element in vs to cerr followed by a newline
 
+    || LAMBDAS ARE FUNCTION OBJECTS ||
+        When we write a lambda, the compiler translates that expression into an unnamed object of an unnamed class. 
+         The classes generated from a lambda contain an overloaded function-call operator.
 
+         ex. the lambda that we passed as the last argument to stable_sort:
+            
+                stable_sort(words.begin(), words.end(),
+                            [](const string &a, const string &b) { return a.size() < b.size(); });
+            ACTS LIKE
+                class ShorterString {
+                public:
+                    bool operator()(const string &s1, const string &s2) const { return s1.size() < s2.size(); }
+                };
+            
+        The generated class has a single member, which is a function-call operator that takes 2 strings and compares length. The
+         parameter list and function body are the same as the lambda. Lambdas may not change captured variables. As a result, 
+         by default, the function-call operator in a class generated from lambda is a const member function. 
+        
+        If the lambda is declared as mutable, then the call operator is not const. 
+
+        We can rewrite stable_sort to use this class instead of a lambda.
+
+            ex. stable_sort(words.begin(), words.end(), ShorterString());
+        
+        | CLASSES REPRESENTING LAMBDAS WITH CAPTURES |
+            When a lambda captures a variable by reference, it is up to the program to ensure that the variable to which the reference refers
+             exists when the lambda is executed. The compiler is permitted to use the reference directly without storing that reference
+             as a data member in the generated class.
+
+            In contrast, variables captured by value are copied into the lambda. Classes generated from lambdas that capture variables by value
+             have data members corresponding to such variable. 
+
+             *This lambda:
+                auto wc = find_if(words.begin(), words.end() [sz](const string &a))
+             *Generates a class like this:
+                class SizeComp {
+                public:
+                    SizeComp(size_t n): sz(n) { } // parameter for each captured variable
+                    // call operator with the same return type, parameters, and body as lambda
+                    bool operator()(const string &s) const { return s.size() > sz; }
+                private:
+                    size_t sz;      // a data member for each variable captured by value
+                }
+            * To use this class, we must pass an argument:
+                auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
+
+            Classes generated from a lambda expression have a deleted default constructor, deleted assignment operator,
+             and a default destructor. Copy/Move constructors depends on types of captured data members.
 */
 
 struct absInt {
