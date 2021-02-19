@@ -28,6 +28,18 @@
 
     e14.38  - Write a class that tests whether the length of a given string matches a given bound. Use that object to write a program
                 to report how many words in an input file are of sizes 1 through 10 inclusive
+
+                    see. e1438.cpp
+
+    e14.39  - Revise the previous program to report the count of words that are sizes 1 through 9 and 10 or more.
+                Default-initialize parameter upper limit. 
+
+                    see. e1439.cpp
+    
+    e14.40  - Rewrite the biggies function from 10.3.2 to use function-object classes in place of lambdas
+
+                    see. e1440.cpp
+
 */
 
 /************ CLASSES ************/

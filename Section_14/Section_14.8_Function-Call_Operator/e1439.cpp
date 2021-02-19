@@ -7,13 +7,13 @@
 #include <set>
 
 /*
-    e14.38  - Write a class that tests whether the length of a given string matches a given bound. Use that object to write a program
-                to report how many words in an input file are of sizes 1 through 10 inclusive
+    e14.39  - Revise the previous program to report the count of words that are sizes 1 through 9 and 10 or more.
+                Default-initialize parameter upper limit. 
 */
 
 class CheckSize {
 public:
-    CheckSize(std::size_t u, std::size_t l) : upper(u), lower(l) { } ;
+    CheckSize(std::size_t l, std::size_t u = -1) : lower(l), upper(u) { } ;
     bool operator()(const std::string &s) const { return s.length() >= lower && s.length() <= upper; }
 private:
     std::size_t upper;
@@ -39,11 +39,13 @@ int main(int argi, char **argc)
         std::cerr << "ERROR: No File." <<std::endl;
     }
 
-    std::size_t upper = 5, lower = 1;
-    auto count = std::count_if(svec.begin(), svec.end(), CheckSize(upper, lower));
+    std::size_t upper = 10, lower = 1, max = 100;
+    auto range = std::count_if(svec.begin(), svec.end(), CheckSize(lower, upper));
+    auto above = std::count_if(svec.begin(), svec.end(), CheckSize(upper));
 
-    std::cout << count << ((count > 1 ) ? " word " : " words ") << "are within bounds " << upper  
-              << " and " << lower << ".";
+    std::cout << range << ((range > 1 ) ? " word " : " words ") << "are within bounds " << lower  
+              << " and " << upper << "." <<std::endl;
+    std::cout << above << ((range > 1) ? " word " : " words ") << "are above " << upper << "." <<std::endl;
 
     return 0;
 }
