@@ -40,6 +40,11 @@
 
                     see. e1440.cpp
 
+    e14.41  - Why do you suppose the new standard added lambdas? Explains when you would use a lambda and when you'd write a class instead.
+                Lambdas work well when doing only modest comparisons. In most cases, the purpose of a lambda is to return a bool statement 
+                about two or more variables. In cases where there are a lot more variables, or even significantly more calculations needed,
+                a class might work better, especially if certain member objects need to be initialized for later use. 
+
 */
 
 /************ CLASSES ************/
