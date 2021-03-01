@@ -64,12 +64,32 @@
         Overloaded operators ARE overloaded functions. Normal function matching is used to determine which operator, built-in or user-defined,
          should apply.
 
+    *NOTE* The set of candidate functions for an operator used in an expression can contain both nonmember and member functions.
+
+
 */
+
+class SmallInt {
+    friend  SmallInt operator+(const SmallInt&, const SmallInt&);
+public:
+    SmallInt(int i = 0) : val(i) { };       // conversion from int
+    operator int() const { return val; }    // conversion to int
+private:
+    std::size_t val;
+};
+
+SmallInt operator+(const SmallInt &a, const SmallInt &b) {
+    SmallInt c;
+    c.val = a.val + b.val;
+    return c;
+}
 
 
 int main()
 {
-
+    SmallInt s1(1), s2(2);
+    SmallInt s3 = s1 + s2;
+    //int i = s3 + 0;         // error: ambiguous overload for 'operator+'
 
     return 0;
 }
