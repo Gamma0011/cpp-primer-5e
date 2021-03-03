@@ -2,6 +2,9 @@
 #include <string>
 #include "Book_Limit.h"
 
+// Good explaining on the need for inheritance in OOP
+// https://www.geeksforgeeks.org/inheritance-in-c/
+
 /*
     e15.1   - What is a virtual member?
                 A virtual member is declared in a Base Class with the intention that Derived Classes with inherit
@@ -33,6 +36,56 @@
 
                 see. Book_Limit.h
 
+    e15.8   - Define static type and dynamic type.
+                Static type is always known at compile time (return type or declared). Dynamic types aren't known until run time
+                 and is variable.
+
+                Functions or expressions with the ability to use an object of base or derived type is dynamic because the object that
+                 will be used is unknown until run time.
+
+    e15.9   - When is it possible for an expression's static type to differ from its dynamic type. Give 3 examples.
+                Base Class - Base ; Derived Class - Derived
+
+                When an expression is a reference or a pointer.
+
+                1) Pass expression to function via & or *
+                    Derived d;
+                    void foo(Base &);
+                    foo(&d);
+                
+                2) Point a pointer of base class at a derived object
+                    Derived d;
+                    Base *b = d;
+                
+                3) Reference a derived class type using base class type &
+                    Derived d;
+                    Base &d = d;
+
+    e15.10  - Recalling the discussion from pg. 311, explain how the program on page 317 that passed an ifstream 
+                to the Sales_data read function works.
+
+            ifstream is a derived class of istream and therefore objects of type ifstream are accepted where class istream is expected.
+            Read then uses the members of istream to read the input from the original ifstream object and return type istream.
+
+            std::istream& read(std::istream&, Sales_data&;
+
+            ifstream input(argv[1]);
+            ofstream output(argv[2]);
+            Sales_data total;
+            if(read(input, total)) {
+                Sales_data transfer;
+                while(read(input, transfer)) {
+                    if (total.isbn() == trans.isbn()) {
+                        total.combine(trans);
+                    } else {
+                        print(output, total) <<std::endl;
+                        total = trans
+                    }
+                }
+                print(output, total) <<std::endl;
+            } else {
+                std::cerr << "No data" <<std::endl;
+            }
 */
 
 class Quote {
