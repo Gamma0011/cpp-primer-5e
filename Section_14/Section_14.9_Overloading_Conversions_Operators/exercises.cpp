@@ -40,7 +40,50 @@
                     return make.empty() || manufacturer.empty() || year == 0 || mileage == 0;
                 }
 
+    e14.50  - Show the possible class-type conversion sequences for the initialization of ex1 and ex2. Are they legal?
+
+                struct LongDouble {
+                    LongDouble(double = 0.0);
+                    operator double();
+                    operator float();
+                };
+                LongDouble 1dObj;
+                int ex1 = 1dObj;
+                float ex2 = 1dObj;
+
+             ex1 is illegal because the call is ambiguous - could take path of operator float() or operator double()
+             ex2 is legal, takes path of operator float()
+
+    e14.51  - Show the conversion sequences (if any) needed to call each version of calc and explain why best viable function is selected.
+
+                void calc(int);
+                void calc(LongDouble);
+                double dval;
+                calc(dval);     // which calc?
+
+                Answer: error: call of overloaded 'calc(double&)' is ambiguous
+    
+    e14.52  - Which operator+, if any, is selected for each of the addition expressions?
+
+                struct LongDouble {
+                    //member operator+ for illustration purposes; + is usually nonmember
+                    LongDouble operator+(const SmallInt &); 
+                };
+
+                LongDouble operator+(LongDouble&, double);
+                SmallInt si;
+                LongDouble ld;
+                ld = si + ld;
+                ld = ld + si;       // uses LongDouble operator+(LongDouble&, double)
 */
+
+void calc(int i) {
+    std::cout << "Int : " << i <<std::endl;
+}
+
+void calc(long double ld) {
+    std::cout << "Long Double : " << ld <<std::endl;
+}
 
 
 int main()
