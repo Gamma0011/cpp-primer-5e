@@ -52,9 +52,84 @@
         Otherwise, implementation members should be PRIVATE.
 
     | FRIENDSHIP AND INHERITANCE |
+        Friendship is also not inherited. Friends of the base have no special access to members of its derived classes, and friends of derived class
+         have no special access to the base class.
+
+         see. class Base, class Sneaky, and Class Pal
         
+        In the case of f3(Sneaky &), this is legal because the base class controls its own members. Access includes access to Base objects that are
+         embedded in an object of type derived from Base (because prot_mem) is a shared member of all classes derived from Base.
+
+        *NOTE* Friendship is not inherited.
+         ex.
+            class D2 : public Pal {
+            public:
+                int mem(Base b) { return b. prot_mem; }     // error: friendship does not inherit.
+            };
+        
+    | EXEMPTING INDIVIDUAL MEMBERS |
+        We can change access level of a name that a derived class inherits by the USING declaration.
+        
+        see. class Base2 and class Derived : private Base2
+        
+        Because class Derived uses private inheritance, size and n are by default private members of Derived. The USING declaration adjusts
+         the accessibility of those members. Users of Derived can access the size member and classes subsequently derived from derived can access n
+
+        The USING declaration inside a class can name any accessible (not private) member of a direct or indirect base class. The USING declaration 
+         takes the access control specified in its declared section of the class (ex. private, public, protected)
+
+        *NOTE* A derived class may provide a using declaration only for names it is permitted to access.
+
+    | DEFAULT INHERITANCE PROTECTION LEVELS |
+        class - derived class defaults to private inheritance
+        struct - derived struct defaults to public inheritance
+
+        class Base {};
+        struct D1 : Base {};    // public inheritance by default
+        class D2 : Base {};     // private inheritance by default
+    
+    *BEST PRACTICE* A privately derived class should specify private explicitly rather than rely on defaults. This makes it clear private inheritance is intended.
 
 */
+
+class Base {
+    friend class Pal;
+public:
+    void pub_mem();
+protected:
+    int prot_mem;
+private:
+    char priv_mem;    
+};
+
+class Sneaky : public Base {
+    friend void clobber(Sneaky&);
+    int j;
+};
+
+class Pal {
+public:
+    int f(Base b) { return b.prot_mem; }
+    //int f2(Sneaky s) { return s.j; }  // error: Pal is not friend of Sneaky
+    int f3(Sneaky s) { return s.prot_mem;}  // ok: Pal is friend
+};
+
+///////////////////////////////////////////
+
+class Base2 {
+public:
+    std::size_t size() const { return n; }
+protected:
+    std::size_t n;
+};
+
+class Derived : private Base2 {
+public:
+    // maintain access levels for members related to size of object
+    using Base2::size;
+private:
+    using Base2::n;
+};
 
 int main()
 {
