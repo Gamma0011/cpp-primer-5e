@@ -39,6 +39,7 @@
                 a) Graphical file formats   - see graphical_file_formats.h
     
     e15.22  - For the class you chose, identify some of the likely virtual functions as well as public and protected members  
+
 */
 
 void e1520() {
@@ -63,15 +64,21 @@ void get_info(Graphical_File &f, std::ostream &os) {
     f.print(os);
 }
 
+void test() {
+    GIF g1("test.gif", 10, 1080, 1920, 24);
+    JPEG j1("mountains.jpeg", 32, 1080, 1920, 0);
+
+    g1.print(std::cout);
+    std::cout <<std::endl;
+    j1.print(std::cout);
+    j1.crop(1000,1000);
+    std::cout <<std::endl;
+    j1.print(std::cout);
+
+}
+
 int main()
 {
-    GIF g1("test.gif", 12, 300, 300, 4);
-    JPEG j1("mountains.jpeg", 3, 1920, 1080, 90);
-    get_info(g1, std::cout);
-    std::cout <<std::endl;
-    get_info(j1, std::cout);
-
-    
-
+    test();
     return 0;
 }
