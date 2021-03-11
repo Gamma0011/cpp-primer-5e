@@ -65,6 +65,45 @@
         We can specifically call the Base::memfcn() from a Derived class by:
             Derived d | d.memfcn(10);
             d.Base::memfcn();           // calls Base::memfcn();
+    
+    | VIRTUAL FUNCTIONS AND SCOPE |
+        If the base and derived members took arguments that differed from one another, there would be no way to call the
+         derived version through reference or pointer to the base class.
+
+    | CALLING A HIDDEN VIRTUAL THROUGH BASE CLASS |
+
+        see. classes Base2, D1, D2
+
+        Base2 bobj; D1 d1obj; D2 d2obj;
+        Base *bp1 = &bobj; Base *bp2 = &d1obj; Base *bp3 = &d2obj;
+        bp1->fcn() | calls Base::fcn()
+        bp2->fcn() | calls Base::fcn()
+        bp3->fcn() | calls D2::fcn()
+
+        D1 *d1p = &d1obj; D2 *d2p = &d2obj;
+        bp2->f2() | error: base has no members called f2()
+        d1p->f2() | calls D1::f2
+        d2p->f2() | calls D2::f2
+
+        Because fcn() is virtual, the calls from objects of base class type are called at run time.
+
+        Base *p1 = &d2obj; D1 *p2 = &d2obj; D2 *p3 = &d2obj;
+        p1->fcn(42) | error: Base has no fcn(int)
+        p2->fcn(42) | calls D1::fcn(int)    statically bound     
+        p3->fcn(42) | calls D2::fcn(int)    statically bound
+
+        Dynamic type doesn't matter when we call a nonvirtual function (in this case, void fcn(int)). The version
+         calls only depends on the static type of the pointer itself.
+
+    | OVERRIDING OVERLOADED FUNCTIONS |
+        A virtual member function can also be overloaded. A derived class can override zero or more instances of the overloaded
+         functions it inherits. If a derived class wants to make the overloaded versions available through its type, it must
+         override all of them, or none of them.
+
+        In some cases, the derived class may need to override some, but not all. Instead of overriding every base-class version
+         a derived class inherits, a derived class can provide a USING declaration for the overloaded member. A using 
+         declaration ONLY specified a name and may not list parameters. A using declaration for a base-class member function adds
+         ALL overloaded instances of that function to the scope of the derived class. 
 */
 
 struct Base {
@@ -85,6 +124,25 @@ void test() {
     Derived d(42);
     std::cout << d.get_mem() << '\t' << d.get_base_mem() <<std::endl;       // prints 42
 }
+
+/////////////////////////////////////////////
+
+class Base2 {
+public:
+    virtual int fcn();
+};
+
+class D1 : public Base2 {
+public:
+    int fcn(int);       // parameter list differs from fcn in Base2
+    virtual void f2();
+};
+
+class D2 : public D1 {
+    int fcn(int);       // nonvirtual, hides D1::fcn(int)
+    int fcn();          // overrides virtual void fcn() from Base2
+    void f2();          // overrides virtual void f2() from D1
+};
 
 int main()
 {
