@@ -32,9 +32,6 @@ public:
         os << bookNo << "\t" << price;
         return os;
     }
-
-    virtual double net_price(std::size_t n) const { return price * n; }
-
 private:
     std::string bookNo;
 protected:

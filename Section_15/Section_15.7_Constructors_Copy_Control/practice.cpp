@@ -112,6 +112,39 @@
         
         *NOTE* If a constructor or destructor calls a virtual, the version run corresponds to that one within the type itself.
 
+    | INHERITED CONSTRUCTORS |
+        Under the new standard, a derived class can reuse the constructors defined by its direct base class. A derived class cannot inherit the default,
+         copy, and move constructors. If a derived class does not directly define these constructors, the compiler synthesizes them.
+
+        The USING declaration allows the derived class to inherit its base-class constructors.
+
+            class Bulk_quote : public Disc_quote {
+                public:
+                    using Disc_quote::Disc_quote;       // inherit Disc_quote's constructors
+                    double net_price(std::size_t) const;
+            };
+
+        When using is applied to a constructor, it causes the compiler to generate a derived constructor corresponding to each constructor in the base. For 
+         each constructor in the base class, the compiler generates a constrctor in the derived class with the same parameter list.
+            
+            SYNTAX: derived(params) : base(args) { }
+
+        The derived constructor from the above class would be as follows:
+        
+            Bulk_quote(const std::string &book, double price, std::size_t qty, double disc) :
+                Disc_quote(book, price, qty, disc) { }
+        
+        If the derived class has any data members of its own, those members are default initialized.
+
+    | CHARACTERISTICS OF AN INHERITED CONSTRUCTOR |
+        A constructor using declaration does not change the access level of the inherited constructors. Regardless of where USING appears, a private constructor
+         in the base class will be inherited as private in the derived. The same goes for protected and public members.
+
+        Additionally, USING cannot declare explicit or constexpr. These must be inherited from the base.
+
+        Also, default arguments are no carried over from base to derived constructors. A class containing only inherited constructors 
+         will still synthesize a default constructor.
+
 */
 
 class B {

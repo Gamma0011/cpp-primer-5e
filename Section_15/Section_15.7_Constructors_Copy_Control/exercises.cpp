@@ -22,14 +22,23 @@
                          is the only option to actually create an object of type Disc_Quote
 
     e15.26  - Define Quote and Bulk_quote copy-control members to do the same job as the synthesized versions. Give them print statements.
-                    see. quote.h        *NEEDS MORE WORK - look into copy constructor and copy-assignment in base && derived*
+                    see. quote.h        
+
+    e15.27  - Redefine your Bulk_quote class to inherit its constructors.
+                    see. quote.h        Default constructor now:    using Disc_quote::Disc_quote;
 
 */
 
 int main()
 {
     Bulk_quote bq1("Book", 9.99, .25, 10);
+    std::cout << std::endl;
     Bulk_quote bq2 = bq1;
+    std::cout << std::endl;
+    Bulk_quote bq3(bq2);
+    std::cout << std::endl;
+    Bulk_quote bq4(std::move(bq3));
+    std::cout << std::endl;
 
     return 0;
 }
