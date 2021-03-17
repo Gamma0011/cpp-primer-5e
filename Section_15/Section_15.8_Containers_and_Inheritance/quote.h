@@ -27,11 +27,17 @@ public:
     }
     virtual ~Quote() {std::cout << "~Quote()" << std::endl; };
  
+    virtual Quote* clone() const & { return new Quote(*this); }         // virtual function to return a dynamically allocated copy of itself
+    virtual Quote* clone() && { return new Quote(std::move(*this)); }   // these members use reference qualifiers
+
     std::string print() { return bookNo; }
     virtual std::ostream& getInfo(std::ostream &os) const {
         os << bookNo << "\t" << price;
         return os;
     }
+
+    virtual double net_price(std::size_t n) const { return price * n; }
+    std::string isbn() { return bookNo; }
 private:
     std::string bookNo;
 protected:
@@ -118,7 +124,11 @@ public:
         std::cout << "Bulk_quote& operator=(Bulk_quote &&rhs)" << std::endl;
         return *this;
     }
+
     double net_price(std::size_t) const override;
+
+    Bulk_quote* clone() const & { return new Bulk_quote(*this); }
+    Bulk_quote* clone() && { return new Bulk_quote(std::move(*this)); }
 };
 
 class Limited_discount : public Disc_quote {
@@ -133,7 +143,7 @@ private:
 
 double Bulk_quote::net_price(std::size_t n) const {
     if (quantity > n) {
-        return (price * quantity) * discount;
+        return (price * quantity) * (1 - discount);
     } else {
         return price * quantity;
     }
@@ -152,6 +162,12 @@ std::ostream& Disc_quote::getInfo(std::ostream &os) const {
     Quote::getInfo(os);
     os << "\t" << discount << "\t" << quantity << std::endl;
     return os;
+}
+
+double print_total(std::ostream &os, const Quote &q, std::size_t n) {
+    double ret = q.net_price(n);
+    q.getInfo(os);
+    return ret;
 }
 
 

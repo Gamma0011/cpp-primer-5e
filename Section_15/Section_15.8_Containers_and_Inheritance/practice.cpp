@@ -39,7 +39,43 @@
 
          In practice, because of this, all objects in the basket vector have the same type.
 
+    | WRITING A BASKET CASE |
+        In C++ we cannot use objects directly to support OOP. We must use pointers and references. Because pointers impose
+         complexity on our programs, we often define auxiliary classes to help manage the complexity. 
+
+         see. basket.h
+
+        Users are still responsible for dynamic memory because add_item takes a shared_ptr. Because of this, users have to write
+         code, such as:
+            Basket bsk;
+            bsk.add_item(make_shared<Quote>("123", 45));
+            bsk.add_item(make_shared<Bulk_quote>("345", 45, 4, .15));
+        
+        The next step is redefining add_item so that it takes a Quote object instead of a shared_ptr. This new version of add_item
+         will handle all memory allocation. This will be done with:
+            void add_item(const Quote &sale);       // copy given object
+            void add_item Quote &&sale);            // move given object
+
+        add_item doesn't know which type to allocate however. To solve this, we'll give our Quote classes a virtual member that
+         allocates a copy itself. 
+
+            see.    quote.h functions:
+                    virtual Quote* clone() const & { return new Quote(*this); }
+                    virtual Quote* clone() && { return new Quote(std::move(*this)); }
+                    Bulk_quote* clone() const & { return new Bulk_quote(*this); }
+                    Bulk_quote* clone() && { return new Bulk_quote(std::move(*this)); }
+
+            Our clone function in base Quote is virtual, which allows for the compiler to use the dynamic type of the object provided at run time.
+                (ex. object of type Quote or Bulk_quote will call its respective clone rvalue or lvalue function)
+             With this, clone returns a pointer to a newly allocated object of its own type. We bind a share_ptr to that object and call insert to
+              add the newly allocated object to the items multiset. 
+
+            *Note* Because shared_ptr supports derived-to-base conversion, we can bind a shared_ptr<Quote> to a Bulk_qpte*
+
+
 */
+
+
 
 int main()
 {
