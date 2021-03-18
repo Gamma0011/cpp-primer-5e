@@ -32,7 +32,7 @@ public:
 
     std::string print() { return bookNo; }
     virtual std::ostream& getInfo(std::ostream &os) const {
-        os << bookNo << "\t" << price;
+        os << bookNo << "\t $" << price;
         return os;
     }
 
@@ -167,6 +167,7 @@ std::ostream& Disc_quote::getInfo(std::ostream &os) const {
 double print_total(std::ostream &os, const Quote &q, std::size_t n) {
     double ret = q.net_price(n);
     q.getInfo(os);
+    std::cout << std::endl;
     return ret;
 }
 

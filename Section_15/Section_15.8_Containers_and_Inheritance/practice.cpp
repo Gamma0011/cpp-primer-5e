@@ -70,7 +70,7 @@
              With this, clone returns a pointer to a newly allocated object of its own type. We bind a share_ptr to that object and call insert to
               add the newly allocated object to the items multiset. 
 
-            *Note* Because shared_ptr supports derived-to-base conversion, we can bind a shared_ptr<Quote> to a Bulk_qpte*
+            *Note* Because shared_ptr supports derived-to-base conversion, we can bind a shared_ptr<Quote> to a Bulk_quote*
 
 
 */
