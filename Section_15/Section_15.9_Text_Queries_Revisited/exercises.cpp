@@ -1,4 +1,7 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
 #include <string>
 #include "query.h"
 
@@ -20,22 +23,57 @@
                 Query_base is an abstract base class and therefore cannot directly have objects created. It provides
                  a common interface to its derived classes. No operations available in abstract base classes.
 
-    e15.34  - For the expression built on pg 639:
-            
-            a) List constructors executed in processing expression.
+    e15.34  - For the expression built on pg 638:
+                Query q = Query("fiery") & Query("bird") | Query("wind");
 
+
+            a) List constructors executed in processing expression.
+                    Query("fiery") - Query, WordQuery Constructor
+                    Query("bird") - Query, WordQuery Constructor
+                    Query("wind") - Query, WordQuery Constructor
+                    & - Query, AndQuery, BinaryQuery
+                    | - Query, OrQuery, BinaryQuery
             b) List calls to rep that are made from cout << q
+                    Query -> Query_base ->
+                            OrQuery (lhs) -> Query -> Query_base ->
+                            AndQuery (lhs) -> Query -> Query_base -> WordQuery
+                            AndQuery (rhs) -> Query -> Query_base -> WordQuery
+                            OrQuery (rhs) -> Query -> Query_base -> Word_Query
+
+                            ((fiery & bird) | wind)
+
             c) List calls to eval made from q.eval();
+                Query -> Query_base -> WordQuery ("fiery")
+                Query -> Query_base -> WordQuery ("bird")
+                Query -> Query_base -> WordQuery ("wind")
+                Query -> Query_base -> AndQuery ("fiery", "bird")
+                Query -> Query_base -> OrQuery (AndQuery Outcome, "wind")
+
+                
+    
+    e15.39  - Implement the Query and Query_base classes. Test your application by evaluating and printing a query.
 
 */
 
-int main()
+void e1539() {
+    Query q = Query("fiery") & Query("bird") | Query("wind");
+    std::cout << q;
+
+
+}
+
+int main(int argi, char **argc)
 {
-    std::string s1("string"), s2("test"), s3("not");
+    std::ifstream open(argc[1]);
+    std::ifstream open("text.txt");
 
-    Query a(s1) ;
+    if (open) {
+        
+    } else {
+        std::cerr << "No File Provided!" <<std::endl;
+        return -1;
+    }
 
-    ~a;
 
     return 0;
 }

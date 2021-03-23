@@ -34,6 +34,9 @@ public:
                 std::shared_ptr<std::set<std::vector<std::string>::size_type>> p,
                 std::shared_ptr<std::vector<std::string>> f) :
                 sought(s), lines(p), file(f) { };
+    std::set<TextQuery::line_no>::iterator begin() const { return lines->begin(); }
+    std::set<TextQuery::line_no>::iterator end() const { return lines->end(); }
+    std::shared_ptr<std::vector<std::string>> get_file() const { return file; }
 private:
     std::string sought;                                                     // word this query represents
     std::shared_ptr<std::set<std::vector<std::string>::size_type>> lines;   // line nums it's on

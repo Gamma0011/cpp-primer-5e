@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <algorithm>
 #include "text_query.h"
 
 /*
@@ -30,6 +31,8 @@
         WORDQUERY: Purpose is to hold the search word. Looks for a given string. Only operation that performs
          a query on the provided TextQuery object.
 
+        EVAL FUNCTIONS: calls on the operands and applies unique logic: OrQuery eval operation returns union of lhs and rhs. 
+            AndQuery returns intersection. NotQuery returns line numbers that are not in operand's set
 */
 
 // abstract class acts as a base class for concrete query types; all members are private
@@ -91,7 +94,7 @@ protected:
         lhs(l), rhs(r), opSym(s) { }
 
     // abstract class: Binary doesn't define eval. Left to AndQuery and OrQuery
-    std::string rep() const { return "(" + lhs.rep() + " "
+    std::string rep() const override { return "(" + lhs.rep() + " "
                                          + opSym + " "
                                          + rhs.rep() + ")"; }
     Query lhs, rhs;         // right- and left-hand operators
@@ -106,7 +109,7 @@ private:
     };
     
     // Concrete Class: inherits rep, defines virtual eval
-    QueryResult eval(const TextQuery&) const;
+    QueryResult eval(const TextQuery&) const override;
 };
 
 class OrQuery : public BinaryQuery {
@@ -117,7 +120,7 @@ private:
     };
 
     // Concrete Class: inherits rep, defines virtual eval
-    QueryResult eval(const TextQuery&) const;
+    QueryResult eval(const TextQuery&) const override;
 };
 
 /********* COMPARISON OPERATORS *********/
@@ -151,4 +154,52 @@ std::ostream &operator<<(std::ostream &os, const Query &query) {
     return os << query.rep();
 }
 
+/********* ORQUERY EVAL *********/
+QueryResult
+OrQuery::eval(const TextQuery &text) const {
+    // virtual calls through Query members, lhs and rhs
+    // the calls to eval return the Query Result for each operand
+    auto right = rhs.eval(text), left = lhs.eval(text);
+    // copy the line numbers from left-hand operand into result set
+    auto ret_lines = std::make_shared<std::set<line_no>>(left.begin(), left.end());
+    // insert lines from right-hand operand
+    ret_lines->insert(right.begin(), right.end());
+    return QueryResult(rep(), ret_lines, left.get_file());
+}
+
+/********* ANDQUERY EVAL *********/
+QueryResult
+AndQuery::eval(const TextQuery &text) const {
+    // virtual calls through the Query operands to get result sets for operands
+    auto left = lhs.eval(text), right = rhs.eval(text);
+    auto ret_lines = std::make_shared<std::set<line_no>>();
+    // writes the intersection of the two ranges to a destination iterator
+    // destination iterator in this call adds elements to ret
+    std::set_intersection(left.begin(), left.end(),
+                          right.begin(), right.end(),
+                          std::inserter(*ret_lines, ret_lines->begin()));
+    return QueryResult(rep(), ret_lines, left.get_file());
+}
+
+/********* NOTQUERY EVAL *********/
+QueryResult
+NotQuery::eval(const TextQuery &text) const {
+    auto result = query.eval(text);
+    auto ret_lines = std::make_shared<std::set<line_no>>();
+    auto beg = result.begin(), end = result.end();
+
+    auto sz = result.get_file()->size();
+    for (std::size_t n = 0 ; n != sz ; ++n) {
+        if (beg == end || *beg != n) {
+            ret_lines->insert(n);           // if not in result, add this line
+        } else if (beg != end) {
+            ++beg;                          // otherwise get the next line number in result if there is one
+        }
+    }
+    return QueryResult(rep(), ret_lines, result.get_file());
+}
+
 #endif
+
+
+

@@ -1,0 +1,6 @@
+this is a test file that I will use to see whether 
+or not I was able to successfully write a Text Query program
+with the help of C++ Primer
+This chapter was very difficult, but it's good to know that
+base and derived classes are essential to OOP and the C++ language. Once I get
+the hang of it, I'm sure it'll be awesome.
