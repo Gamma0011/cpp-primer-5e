@@ -52,6 +52,8 @@
                 
     
     e15.39  - Implement the Query and Query_base classes. Test your application by evaluating and printing a query.
+                    *Need to come back when I have a better understanding of this topic*
+
 
 */
 
@@ -62,17 +64,8 @@ void e1539() {
 
 }
 
-int main(int argi, char **argc)
+int main(int argi, char **argv)
 {
-    std::ifstream open(argc[1]);
-    std::ifstream open("text.txt");
-
-    if (open) {
-        
-    } else {
-        std::cerr << "No File Provided!" <<std::endl;
-        return -1;
-    }
 
 
     return 0;
