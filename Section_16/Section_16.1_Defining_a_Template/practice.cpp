@@ -11,6 +11,14 @@ int compare(const T &v1, const T &v2) {
 }
 */
 
+// this type will also work on pointers
+template<typename T>
+int compare(const T& v1, const T& v2) {
+    if (std::less<T>() (v1,v2)) return -1;
+    if (std::less<T>() (v2, v2)) return 1;
+    return 0;
+}
+
 template<typename T>
 T foo (T* p) {
     T temp = *p;
@@ -94,8 +102,52 @@ int compare(const char (&p1)[m], const char (&p2)[n]) { return strcmp(p1, p2); }
         *NOTE* inline falls after template and parameter list, but precedes the function return type
 
         The int compare() function illustrated two important principales for writing generic code:
-            - Function parameters are const&
-            - Tests in body only use < comparisons
+            - Function parameters are const& (functions can be used on types that cannot be copied)
+            - Tests in body only use < comparisons ()
+
+        *NOTE* Template programs should try to minimize the number of requirements placed on the argument type.
+
+        // this version of compare will be correct even if used on pointers
+        template<typename T> int compare(const T &v1, const T &v2) {
+            if (less<T>() (v1,v2)) return -1;
+            if (less<T>() (v2,v1)) return 1;
+            return 0;
+        }
+
+    || TEMPLATE COMPILATION ||
+        Template code is only generated when we instantiate a specific instance of the template. This causes two things:
+            1. How we organize our source code
+            2. When errors are detected
+
+        Normally, when we call a function, the compiler needs only a declaration. For an object of class type, the definition must be 
+         available, but the definitions of member functions need not be present. 
+
+        Therefore, we put class definitions and function declarations in header files and definitions of ordinary and class-member functions in source files.
+
+        
+        For a template: to generate an instantiation, the compiler needs to have the code that defines function template or class template member function.
+        *NOTE* Headers for templates typically include definitions as well as declarations.
+
+    || KEY CONCEPT: TEMPLATES AND HEADERS ||
+        Templates contain two kinds of names:
+            - Those that do not depend on a template parameter.
+            - Those that do.
+
+        All names not dependent on a template parameter must be visible when template is used. Additionally, the definition of the template,
+         must be visible when the template is instantiated.
+
+        The user of the template must ensure that everything needed to instantiate the template are visible when needing to be.
+
+        Authors of templates should provide a header that contains template definitions and declarations for all names used in class template 
+         or definitions of its members. Users must include a header for the template and any types used to instantiate that template.
+
+    || COMPILATION ERRORS ARE MOSTLY REPORTED DURING INSTANTIATION ||
+        Type-related errors are normally found during instantiation. A template might not be overtly type specific, but there are some 
+         assumptions that need to be made about the type that will be used.
+
+         ex. if (v1 < v2) return -1; // assumes objects of type T support < operator
+
+        *NOTE* It is up to the caller to guarantee that the arguments passed to templates support required operations.
 
 */
 
