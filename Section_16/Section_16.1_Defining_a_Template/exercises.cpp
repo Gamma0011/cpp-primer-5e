@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <array>
 #include <vector>
 #include <list>
 
@@ -50,9 +51,52 @@
                     }
                 }
     e16.6   - How do you think the library begin and end functions that take an array argument work? Define a version of these functions.
-                *NEED TO DO*
+                The library functions take the array type (typename T) and its size (unsigned N). Being returns just a pointer to the array,
+                 which returns element 0 in the array.
+
+                End accepts the same arguments, but uses the array size to return a pointer to the element one-off-the-end of the array.
+                
+                template<typename T, unsigned N>
+                T* begin_ret(T (&arr)[N]) {
+                    return arr;
+                }
+
+                template<typename T, unsigned N>
+                T* end_ret(T (&arr)[N]) {
+                    return &arr[N];
+                }
+
+    e16.7   - Write a constexpr template that returns the size of a given array.
+
+                template<typename T, unsigned N>
+                constexpr std::size_t sz(T (&arr)[N]) {
+                    return N;
+                }
+    
+    e16.8   - In the "Key Concept" box on page 108, we noted that as a matter of habit, C++ prefers to use != to using <. Explain the rational.
+                In order to account for usage and iteration through elements of a container, we should use != because that is guaranteed to ALWAYS
+                 be defined for that container. It's also more explicit in how to perform the iteration. If elements !=, then continue. < is a
+                 bit more ambiguous. 
 
 */
+// e16.7
+template<typename T, unsigned N>
+constexpr std::size_t sz(T (&arr)[N]) {
+    return N;
+}
+
+// e16.6
+
+template<typename T, unsigned N>
+T* begin_ret(T (&arr)[N]) {
+    return arr;
+}
+
+template<typename T, unsigned N>
+T* end_ret(T (&arr)[N]) {
+    return &arr[N];
+}
+
 
 // e16.4
 template<typename T, typename C> 
@@ -145,13 +189,29 @@ void e165() {
     print(ia, sz);
 }
 
+void e166() {
+    int ia[6] = {0,1,2,3,4,5};
+    auto b = begin_ret(ia);
+    auto e = end_ret(ia);
+    std::cout << *b << '\t' << *(e-1) << std::endl;
+}
+
+void e167() {
+    int ia[10] = {0,1,2,3,4,5,6,7,8,9};
+    std::string sa[2] = {"", ""};
+
+    std::cout << sz(ia) <<std::endl;
+    std::cout << sz(sa) <<std::endl;
+}
+
 int main()
 {
     // e162();
     // e163();
     // e164();
-    e165();
-    
+    // e165();
+    // e166();
+    // e167();
 
     return 0;
 }
