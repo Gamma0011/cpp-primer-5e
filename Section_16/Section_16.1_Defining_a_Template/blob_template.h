@@ -6,7 +6,18 @@
 #include <vector>
 #include <memory>
 
+#include "blobptr_template.h"
+
+// forward declarations needed for friend declarations in Blob
+template<typename> class BlobPtr;
+template<typename> class Blob;
+template<typename T> bool operator==(const Blob<T>&, const Blob<T>&);
+
+
+// defining of class Blob
 template<typename T> class Blob {
+    friend class BlobPtr<T>;
+    friend bool operator==<T>(const Blob<T>&, const Blob<T>&);
 public:
     typedef T value_type;
     typedef typename std::vector<T>::size_type size_type;
@@ -38,7 +49,7 @@ template<typename T>
 Blob<T>::Blob() : data(std::shared_ptr<std::vector<T>>()) { };
 
 template<typename T>
-Blob<T>::Blob(std::initializer_list<T> il) : data(std::make_shared<std::vector<T>>(il)) { };
+Blob<T>::Blob(std::initializer_list<T> il) : data(std::shared_ptr<std::vector<T>>(il)) { };
 
 /************* public member functions *************/
 
