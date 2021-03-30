@@ -25,6 +25,10 @@ public:
     // constructors
     Blob();
     Blob(std::initializer_list<T> il);
+    
+    // copy control
+    Blob(const Blob<T> &);
+    Blob<T>& operator=(const Blob<T> &);
 
     // number of elements in Blob
     size_type size() const { return data->size(); }
@@ -36,6 +40,7 @@ public:
     void pop_back();
 
     // element access
+    T& front();
     T& back();
     T& operator[](size_type i);
 
@@ -51,12 +56,31 @@ Blob<T>::Blob() : data(std::shared_ptr<std::vector<T>>()) { };
 template<typename T>
 Blob<T>::Blob(std::initializer_list<T> il) : data(std::shared_ptr<std::vector<T>>(il)) { };
 
+// copy constructor
+template<typename T>
+Blob<T>::Blob(const Blob<T> &b) {
+    data = b.data;
+}
+
+// copy assignment operator
+template<typename T>
+Blob<T>& Blob<T>::operator=(const Blob<T> &b) {
+    if (*this != b) { data = b.data; }
+    return *this;
+}
+
 /************* public member functions *************/
 
 template<typename T>
 void Blob<T>::pop_back() {
     check(0, "pop_back called on empty Blob");
     data->pop_back();
+}
+
+template<typename T>
+T& Blob<T>::front() {
+    check(0, "Front called on empty Blob");
+    return data->front();
 }
 
 template<typename T>
