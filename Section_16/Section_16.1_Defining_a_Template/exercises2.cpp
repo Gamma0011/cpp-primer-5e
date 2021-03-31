@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "screen.h"
+#include "vec.h"
 
 /*
     e16.9   - What is a function template? What is a class template?
@@ -49,7 +50,7 @@
     
     e16.16  - Rewrite StrVec class as a template named Vec.
 
-                **TO DO**
+                see. vec.h
 */
 
 
@@ -59,9 +60,17 @@ void e1614() {
     std::cout << screen1;
 }
 
+void e1616() {
+    Vec<std::string> svec;
+    svec.push_back("Hello");
+    //svec.push_back("world");
+    std::cout << svec.size() <<std::endl;
+}
+
 int main()
 {
-    e1614();
+    //e1614();
+    e1616();
 
     return 0;
 }
