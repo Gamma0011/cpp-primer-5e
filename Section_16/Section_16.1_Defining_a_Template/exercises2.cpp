@@ -61,10 +61,16 @@ void e1614() {
 }
 
 void e1616() {
-    Vec<std::string> svec;
-    svec.push_back("Hello");
-    //svec.push_back("world");
-    std::cout << svec.size() <<std::endl;
+    Vec<int> ivec;
+    int a = 1;
+    int b = 2;
+
+    std::cout << ivec.size() << " " << ivec.capacity() << "\n";
+
+    ivec.push_back(a);
+    ivec.push_back(b);
+
+    std::cout << ivec.size() << " " << ivec.capacity() <<std::endl;
 }
 
 int main()
