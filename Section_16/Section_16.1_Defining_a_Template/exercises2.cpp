@@ -51,8 +51,58 @@
     e16.16  - Rewrite StrVec class as a template named Vec.
 
                 see. vec.h
+
+    e16.17  - What, if any, are the differences between a type parameter that is declared as a typename and one declared as a class? When must typename be used.
+
+                There's no real difference between the use case of typename and class, and for the most part, they can be interchangeable. However, when 
+                 there is a need for use to specifically tell the compiler that we will be passing a type member via a template, we must declare typename
+                 within the template parameters list and at the function call to tell the compiler that we are using a type and not a variable.
+
+                        ex. template<typename T> typename T::value_type foo();
+    
+    e16.18  - Explain each of the following function template declarations and whether any are illegal.
+
+                a)  template<typename T, U, typename V> void f1(T, U, V);           // illegal, need typename
+                    template<typename T, typename U, typename V> void f1(T, U, V);
+                b)  template<typename T> T f2(int &T);                              // illegal, redefines T
+                    template<typename T> T f2(int &t);                              // t is unique parameter definition
+                c)  inline template<typename T> T foo(T, unsigned int*);            // illegal. inline in wrong position. need to declare template first
+                    template<typename T> inline T foo(T, unsigned int*);        
+                d)  template<typename T> f4(T,T);                                   // illegal. no return type declared
+                    template<typename T> T f4(T,T);
+                e)  typedef char Ctype; template<typename Ctype> Ctype f5(Ctype a); // messy, but legal. Template parameters with same names in global scope hide global scope
+
+    e16.19  - Write a function that takes a reference to a container and prints the elements in that container. Use containers size_type and size members to control loop.  
+
+                see. template<typename T> void print1(const T& t);
+
+    e16.20  - Rewrite the function from the previous exercise to use iterators returned from begin and end to control the loop
+
+                see. template<typename T> void print2(const T& t);
+
 */
 
+template<typename T>
+void print1(const T& t) {
+    if (t.size() == 0) {
+        std::cout << "No elements in container." << std::endl;
+    } else {
+        for (typename T::size_type iter = 0 ; iter != t.size() ; ++iter) {
+            std::cout << t[iter] << std::endl;
+        }
+    }
+}
+
+template<typename T>
+void print2(const T& t) {
+    if (t.size() == 0) {
+        std::cout << "No Elements in container." <<std::endl;
+    } else {
+        for (auto iter = t.begin() ; iter != t.end() ; ++iter) {
+            std::cout << *iter <<std::endl;
+        }
+    }
+}
 
 void e1614() {
     Screen<std::size_t> screen1;
@@ -73,10 +123,29 @@ void e1616() {
     std::cout << ivec.size() << " " << ivec.capacity() <<std::endl;
 }
 
+void e1619() {
+    std::vector<int> ivec = {1,2,3,4,5};
+    print1<std::vector<int>>(ivec);
+
+    std::string s = "Hello World";
+    print1<std::string>(s);
+}
+
+
+void e1620() {
+    std::vector<int> ivec = {1,2,3,4,5};
+    print1<std::vector<int>>(ivec);
+
+    std::string s = "Hello World";
+    print1<std::string>(s);
+}
+
 int main()
 {
     //e1614();
-    e1616();
+    //e1616();
+    //e1619();
+    e1620();
 
     return 0;
 }
