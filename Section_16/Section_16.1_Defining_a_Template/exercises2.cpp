@@ -1,9 +1,14 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <iterator>
 
+#include "blob_template.h"
 #include "screen.h"
 #include "vec.h"
+//#include "debug_delete.h"
+#include "text_query.h"
 
 /*
     e16.9   - What is a function template? What is a class template?
@@ -80,6 +85,23 @@
 
                 see. template<typename T> void print2(const T& t);
 
+    e16.21  - Write your own version of DebugDelete;
+                see. debug_delete.h
+    
+    e16.22  - Revise our TextQuery programs from 12.3 (pg 484) so that the shared_ptr members use DebugDelete as their deleter.
+
+    e16.23  - Predict when a call operator will be executed in the query program. 
+                Every time the shared_ptr's counter == 0, the delete operator is called. Since we're using DebugDelete's operator(),
+                 that is called instead of default_delete.
+    
+    e16.24  - Add a constructor that takes two iterators to your Blob template.
+                
+                see. blob_template.h
+
+                template<typename T>
+                template<typename It>
+                Blob<T>::Blob(It b, It e) : data(std::make_shared<std::vector<T>>(b,e)) { };
+
 */
 
 template<typename T>
@@ -140,12 +162,37 @@ void e1620() {
     print1<std::string>(s);
 }
 
+void e1621() {
+    int *ip = new int;
+    DebugDelete()(ip);
+}
+
+void e1622() {
+    std::ifstream open("text.txt");
+
+    if (!open) {
+        std::cerr << "ERROR: Cannot open file." <<std::endl;
+    } else {
+        TextQuery document(open);
+        print(std::cout, document.query("C++"));
+    }
+
+}
+
+void e1624() {
+    std::vector<std::string> ivec = {"hello", "world"};
+
+    Blob<std::string> sb(ivec.begin(), ivec.end());
+}
+
 int main()
 {
     //e1614();
     //e1616();
     //e1619();
-    e1620();
+    //e1620();
+    //e1621();
+    //e1622();
 
     return 0;
 }

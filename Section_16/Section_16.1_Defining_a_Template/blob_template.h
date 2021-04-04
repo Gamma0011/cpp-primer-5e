@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-#include "blobptr_template.h"
+//#include "blobptr_template.h"
 
 // forward declarations needed for friend declarations in Blob
 template<typename> class BlobPtr;
@@ -25,6 +25,7 @@ public:
     // constructors
     Blob();
     Blob(std::initializer_list<T> il);
+    template<typename It> Blob(It b, It e);
     
     // copy control
     Blob(const Blob<T> &);
@@ -55,6 +56,10 @@ Blob<T>::Blob() : data(std::shared_ptr<std::vector<T>>()) { };
 
 template<typename T>
 Blob<T>::Blob(std::initializer_list<T> il) : data(std::shared_ptr<std::vector<T>>(il)) { };
+
+template<typename T> 
+template<typename It>
+Blob<T>::Blob(It b, It e) : data(std::make_shared<std::vector<T>>(b,e)) { };
 
 // copy constructor
 template<typename T>
