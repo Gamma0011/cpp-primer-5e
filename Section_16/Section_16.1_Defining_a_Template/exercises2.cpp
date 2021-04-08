@@ -102,7 +102,26 @@
                 template<typename It>
                 Blob<T>::Blob(It b, It e) : data(std::make_shared<std::vector<T>>(b,e)) { };
 
+    e16.25  - Explain the meaning of these declarations:
+
+                extern template class std::vector<std::string>;     
+                    - explicit instantiation. template instantiated elsewhere in program. Compiler will not generate code to instantiate class template in current file
+                template class std::vector<Sales_data>;
+                    - also explicit instantiation, but will take place in this current file because no extern declaration. Not guaranteed to exist elsewhere in program.
+
+    e16.26  - Assuming NoDefault is a class that does not have a default constructor, we can explicitly instantiate vector<NoDefault>?
+                No. In order to instantiate a class, the class used for its parameter type must be a default constructor.
+
 */
+
+class NoDefault {
+public:
+    NoDefault() = delete;
+private:
+
+};
+
+template class std::vector<NoDefault>;
 
 template<typename T>
 void print1(const T& t) {
