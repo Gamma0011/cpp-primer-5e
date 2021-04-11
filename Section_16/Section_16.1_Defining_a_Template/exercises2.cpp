@@ -112,6 +112,27 @@
     e16.26  - Assuming NoDefault is a class that does not have a default constructor, we can explicitly instantiate vector<NoDefault>?
                 No. In order to instantiate a class, the class used for its parameter type must be a default constructor.
 
+    
+    e16.27  - For each labeled statement, explain what, if any instantiations happen.
+
+                template<typename T> class Stack {};
+                void f1(Stack<char>);                   // a - no instantiation; will compile as Stack<char> is a defintion. Function will take Stack<char> arg.
+
+                class Exercise {
+                    Stack<double> &rsd;         // b - reference to memory. rsd will hold type Stack<double> No instantiation, will compile.
+                    Stack<int>      si;         // c - Instantiation. Creation of type Stack<int> called si;
+                };
+
+                int main() {
+                    Stack<char> *sc;            // d - pointer to memory of type Stack<char> No instantiation, will compile.
+                    f1(*sc);                    // e - instantiation of Stack<char>.
+                    int iObj = sizeof(Stack<string>);   // f - instantiation of Stack<string> assignment to obj of type int.
+                }
+    
+    e16.28  - Write your own versions of shared_ptr and unique_ptr
+
+                
+
 */
 
 class NoDefault {

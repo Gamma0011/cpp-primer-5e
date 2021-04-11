@@ -114,7 +114,34 @@
             In contrast, the deleter is part of the type of a unique_ptr, making it more complicated to provide a user deleter.
         
         || BINDING DELETER AT RUN TIME ||
+            Although we don't know how the library types are implemented, we can infer that shared_ptr must access its deleter indirectly. The deleter
+             must be store as a pointer or as class that encapsulates a pointer.
+
+            Shared_ptr does not hold the deleter as a direct member and the type is not known until run time. We can construct a shared_ptr using a deleter
+             of one type and subsequently use reset to give the same pointer a different type of deleter. In general, we cannot have a member whose type changes
+             at run time. As a result, the deleter must be stored indirectly.
+
             
+            Assume shared_ptr stores the pointer in a member named p, and that deleter is accessed through a member named del. The destructor must include
+             a statement:
+
+                del ? del(p) : delete p;            // del(p) requires run-time jump to del's location
+
+        || BINDING DELETER AT COMPILE TIME ||
+            Unique_ptr has two template parametes, one that represents the pointer that the unique_ptr manages and the other represents the type of deleter. 
+             Because the deleter is part of the type of a unique_ptr, the type of the deleter member is known at compile time. The deleter can be stored
+             directly in each unique_ptr object.
+
+             // del bound at compile time; direct call to the deleter is instantiated.
+             del(p);                // no run-time overhead
+            
+            The type del is either the default deleter or a user-supplied type. Either way, the code will be executed as it is known at compile time. In some cases,
+             the code might even be inlined at compile time.
+            
+            By binding the deleter at compile time, unique_ptr avoids the run-time cost of an indirect call to its deleter. 
+
+            Binding the deleter at run time, shared_ptr makes it easier to override the deleter.
+
 
 */
 
