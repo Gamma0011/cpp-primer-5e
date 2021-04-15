@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <type_traits>
+#include <vector>
 
 /*
     || TEMPLATE ARGUMENT DEDUCTION ||
@@ -63,13 +65,111 @@
          This normally happens when a function return type differs from any of those in the parameter list.
 
         || SPECIFYING AN EXPLICIT TEMPLATE ARGUMENT ||
-            
+            In some cases, we might want the user to specify which type to use. We'll define a function template named sum that takes arguments of two different
+             types. We'll let the user specify the type of the result. We do this by allowing the user to define a third template parameter representing the return type.
 
+            see. // explicit returns
+
+            No argument can be used to deduce T1 in T1 sum(T2, T3); The caller must provide an explicit template argument for this parameter on each call to sum.
+
+            To supply an explicit template argument the same way we define an instance of class template:
+                auto val3 = sum<long, long>(i, lng);        // long long sum(int, long)
+
+                This call specifies the type for T1. The compiler will deduce the types from i and lng
+
+            Explicit templates are matched to parameter from left to right. T1->T2->T3. An explicit template may be omitted only for the right-most parameters,
+             and then only if these can be deduced from the function parameters. 
+
+                This is an example of poor design, which requires users to specify explicitly all three template parameters:
+                    template<typename T1, typename T2, typename T3>
+                    T3 sum(T2,T1);
+
+                We're have to write:    auto val2 = sum<long long, int, long>(i, lng);
+        
+        || NORMAL CONVERSIONS APPLY FOR EXPLICITLY SPECIFIED ARGUMENTS ||
+            In the same way normal conversions are permitted for parameters defined using ordinary types, normal conversions also apply for arguments
+             whose template type parameter is explicitly stated:
+
+                long lng;
+                compare(lng, 1024);         // error, template parameters don't match   (long, int)
+                compare<long>(lng, 1024);   // okay: instantiates as compare(long, long)
+                compare<int>(lng, 1024);    // okay: instantiates as compare(int, int)
+
+    || TRAILING RETURN TYPES AND TYPE TRANSFORMATION ||
+        Explicit template return types work well when we want the user to determine the return type. In other cases, requiring explicit template arguments
+         can be a burden. 
+
+        As an example, we might want to write a function that takes a pair of iterators denoting a sequence and returns a & to an element in the sequence.
+
+            template<typename It>
+            _ &fcn(It beg, It end) {
+                // process sequence
+                return *beg;
+            }
+
+        We don't know the exact type we want to return, but we do know it'll be a & to the element type of the sequence we're processing. Our function will
+         return *beg, and we know we can use decltype(*beg) to obtain the type from the expression. However, beg doesn't exist until the parameter list
+         has been seen. To define this function, we must use a trailing return type because the return appears after the parameter list.
+
+         // trailing return lets us declare the return type after the parameter list is seen
+         template<typename It>
+         auto &fcn(It beg, It end) {
+             / process
+             return *beg;
+         }
+
+        The compiler knows that fcn's return is the same as the type returned by dereferencing the beg parameter. The dereference operator returns an lvalue,
+         so the type deduced by decltype is a reference to the type of element beg denotes.
+
+        What this means is that a call on a sequence of strings returns string& and a int sequence int&
+
+    || TYPE TRANSFORMATION LIBRARY TEMPLATE CLASSES ||
+        There are no iterator operations that yield elements (opposed to references to elements).
+         To obtain the element type, we can use a library type transformation template. These templates are defined in the <type_traits> header.
+
+        The classes in type_trails are used for so-called template metaprogramming, a topic outside the scope of C++ Primer. However, these templates are useful
+         in ordinary programing 
+
+         remove_reference can be used to obtain an element type, having only one type parameter and a public member named type.
+         If we instantiate remove_reference with a reference type, then type will be the referred-to-type.
+
+            ex. remove_reference<int&> will return type member int
+                
+                remove_reference<decltype(*beg)>::type  
+                    is the type of element to which beg refers: decltype(*beg) returns & type of element type
+                    remove_reference::type strings off the reference, leaving the element instead
+            
+        Using remove_reference and decltype, we can write a function to return a copy of an element's value:
+
+            *NOTE* Must use typename to use a type member of a template parameter. This declares that type represents a type
+
+            template<typename T>
+            auto fcn(T beg, T end) ->
+                typename remove_reference<decltype(*beg)>::type {
+                / process
+                return *beg;
+            }
+
+            *Left off here. Look at table*
 */
 
 // conversions
 template<typename T> T fobj(T, T);              // arguments are copied
 template<typename T> T fref(const T&, const T&);// references
+
+// explicit returns
+template<typename T1, typename T2, typename T3> 
+T1 sum(T2, T3);
+
+// compare
+template<typename T>
+T compare(T a, T b);
+
+// transformation library template classes
+template<typename It> auto fcn(It beg, It end) ->
+typename std::remove_reference<decltype(*beg)>::type {
+    return *beg;
+}
 
 void conversions() {
     std::string s1("a value");
@@ -98,7 +198,9 @@ void normalconversions() {
 
 int main()
 {
+    std::vector<int> ivec = {3,2,3,4,5,6,7};
 
+    std::cout << fcn(ivec.begin(), ivec.end()) << std::endl;
 
     return 0;
 }

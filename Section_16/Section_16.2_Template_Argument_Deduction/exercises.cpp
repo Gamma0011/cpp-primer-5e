@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 
 /*
     e16.32  - What happens during template argument deduction?
@@ -44,16 +45,66 @@
                 e) f1(p1, cp1);         // cannot deduce T, types don't match - passes (int*, const int*)
                 f) f2(p1, cp1);         // legal (int*, const int*)
 
+    e16.37  - The library max function has two function parameters and returns the larger of the args. This function has one template parameter.
+                Could you call max passing an int and a double? If so, how, why or why not?
+
+                You cannot pass an int or a double in the way of generic comparison or by variable. However, you can do so by specifying explicitly
+                 the type you want the compiler to use.
+
+                    ex. max<int>(10.23, 11);
+                        max<double>(100.23, 99);
+
+    e16.38  - When we call make_shared, we have to provide an explicit template argument. Explain why the argument is needed and how it is used.
+                https://www.cplusplus.com/reference/memory/make_shared/
+
+                make_shared<T> specifies the type in the return of shared_ptr<T>.
+
+                    auto a = std::make_shared<int>(19);     a is std::shared_ptr<int>
+
+    e16.39  - Use an explicit template argument to make it sensible to pass two string literals to the original versions of compare.
+
 */
 
 template<typename T>
 T fcn(T a, T b);
 
+// e16.39
+template<typename T>
+int compare(const T &s1, const T &s2) {
+    if (s1 > s2) return 1;
+    if (s1 < s2) return -1;
+    return 0;
+}
+
+
+void e1634() {
+    char c = 'c';
+    //fcn(c, 'c');
+}
+
+void e1637() {
+    int i = 10;
+    double d = 123.03;
+
+    std::cout << std::max<int>(i,d) << '\t'
+              << std::max<double>(i,d) << std::endl;
+}
+
+void e1638() {
+    int i = 10;
+    auto a = std::make_shared<int>(i);
+    std::cout << a << '\t' << *a << std::endl;
+}
+
+void e1639() {
+    std::cout << compare<const char*>("Hello", "World") 
+              << std::endl;
+}
+
 int main()
 {
-    char c = 'c';
-
-    fcn(c, 'c');
+    //e1638();
+    e1639();
 
     return 0;
 }
