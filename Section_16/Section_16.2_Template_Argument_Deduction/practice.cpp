@@ -150,7 +150,13 @@
                 return *beg;
             }
 
-            *Left off here. Look at table*
+        For each type transformation (Table 16.1, pg. 685), the template has a public member named type that represents a type. That type may be 
+         related to the template's own template type parameter in a way that is indicated by the template's name. If it is not responsible
+         or necessary to transform the template's parameter, the type member is the template parameter itself.
+
+         ex. if T is * type, then remove_pointer<T>::type is type to which T points. If T != pointer type, type is same as T
+
+         
 */
 
 // conversions
