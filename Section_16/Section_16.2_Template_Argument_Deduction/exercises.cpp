@@ -63,6 +63,23 @@
 
     e16.39  - Use an explicit template argument to make it sensible to pass two string literals to the original versions of compare.
 
+    e16.40  - Is the following function legal? Why or why not? What are the restrictions on the argument types that can be passed and what is the return type?
+
+                template<typename T>
+                auto fcn3(It beg, It end) -> decltype(*beg + 0) {
+                    return *beg;
+                }
+
+                The following function is legal, but it does have restrictions. The most glaring is that because of the + 0, *beg must be an arithmetic type. 
+                 So, iterations of char or string would not be valid.
+    
+    e16.41  - Write a version of sum with a return type that is guaranteed to be large enough to hold the result of the addition.
+                
+                template<typename T>
+                auto sum(T x, T y) -> decltype(x + y) {
+                    return x+y;
+                }
+
 */
 
 template<typename T>
@@ -76,6 +93,15 @@ int compare(const T &s1, const T &s2) {
     return 0;
 }
 
+template<typename T>
+auto fcn3(T beg, T end) -> decltype(*beg + 0) {
+    return *beg;
+}
+
+template<typename T>
+auto sum(T x, T y) -> decltype(x + y) {
+    return x+y;
+}
 
 void e1634() {
     char c = 'c';
@@ -101,10 +127,30 @@ void e1639() {
               << std::endl;
 }
 
+void e1640() {
+    std::vector<std::string> svec = {"hello", "world"};
+    std::vector<int> ivec = {0,1,2,3,4,5};
+    std::vector<float> fvec = {1.2,5.4};
+
+    //std::cout << fcn3(svec.begin(), svec.end()) << std::endl;
+    std::cout << fcn3(ivec.begin(), ivec.end()) << std::endl;
+    std::cout << fcn3(fvec.begin(), fvec.end()) << std::endl;
+}
+
+void e1641() {
+    short x = 32766;
+    short y = 32766;
+
+    std::cout << x << '\t' << y <<std::endl;
+    std::cout << "Sum: " << sum(x,y) << std::endl; 
+}
+
 int main()
 {
     //e1638();
-    e1639();
+    //e1639();
+    //e1640();
+    e1641();
 
     return 0;
 }
