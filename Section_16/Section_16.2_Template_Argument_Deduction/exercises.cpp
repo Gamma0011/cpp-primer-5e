@@ -80,6 +80,39 @@
                     return x+y;
                 }
 
+    e16.42  - Determine the type of T and val in each of the following calls:
+
+                template<typename T> void g(T&& val);
+
+                int i = 0; const int ci = i;
+
+                a) g(i);        // int& &&, collapses to int&
+                b) g(ci);       // const int& &&, collapses to const int&
+                c) g(i * ci);   // arithmetic of i * ci == int&& &&, collapses to int&&
+
+    e16.43  - Using the function defined in the previous exercise, what would the template parameter of g be if we called g( i = ci ) ?
+                i = ci would be an lvalue. Deduced as int& because of collapsing int& &&.
+
+    e16.44  - Using the same three calls in e16.42, determine the types for T if g's function parameter is declared as T and not T&&. 
+                What if we use const T&?
+
+                T
+                a) g(i);    // i is type int. 
+                b) g(ci);   // i is deduced as int. top-level const ignored
+                c) g(i*ci); // rvalue, deduced as int, copied to lvalue int
+
+                const T&
+                a) g(i);    // i is type int, becomes const int&
+                b) g(ci);   // i is deduced as int, top-level const ignored
+                c) g(i*ci); // rvalue deduced as int. 
+
+                *REMEMBER* Lvalues can accept rvalues
+
+    e16.45  - Given the following template, explain what happens if we call g on a literal value such as 42. What if we call g on a variable of type int?
+                template<typename T> void g(T&& val) { std::vector<T> v; }
+
+                g(42);      42 is an rvalue type int. T resolves to int. vector<int>
+                g(i);       i is an lvalue. Collapses to int&. T is int&. Because of this, vector<int&>
 */
 
 template<typename T>
@@ -102,6 +135,25 @@ template<typename T>
 auto sum(T x, T y) -> decltype(x + y) {
     return x+y;
 }
+
+// e16.44
+template<typename T>
+void g(T) {
+    std::cout << "g(T)" << std::endl;
+}
+
+template<typename T>
+void g(T&& val) {
+    std::vector<T> v;
+}
+
+/*
+template<typename T>
+void g(const T&) {
+    std::cout << "g(const T&)" << std::endl;
+}
+*/
+
 
 void e1634() {
     char c = 'c';
@@ -150,7 +202,7 @@ int main()
     //e1638();
     //e1639();
     //e1640();
-    e1641();
+    //e1641();
 
     return 0;
 }

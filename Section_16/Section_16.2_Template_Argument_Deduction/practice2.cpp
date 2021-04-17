@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 /*
     || FUNCTION POINTERS AND ARGUMENT DEDUCTION ||
@@ -104,10 +105,42 @@
                 template<typename T> void f(T&&);           // binds to noncost rvalues
                 template<typename T> void f(const T&);      // lvalues and const rvalues
 
+    || UNDERSTANDING STD::MOVE ||
+        std::move is a good illustration of a template that uses rvalue references. Looking at how move works can help our
+         understanding of templates. Move is a function template and can take arguments of essentially any type.
 
+         std::move obtains an rvalue reference bound to an lvalue
+
+        || HOW STD::MOVE IS DEFINED ||
+            Move is defined as follows. see // move
+
+            - move's function parameter (T&&) is an value reference to a template parameter type
+            - Via reference collapsing, this parameter can match arguments of any type, can pass rvalue or lvalue
+
+        || HOW STD::MOVE WORKS ||
+
+            consider:   string s1("hi!"), s2;
+
+            s2  = std::move(string("bye"));
+                - Passing an rvalue to an rvalue reference function parameter, the type deduced from argument is referred-to-type
+                - The deduced type of T is string
+                - remove_reference instantiated with string
+                - type member of remove_reference<string> is string
+                - return type of move is string&&
+                - parameter t has type string&&
+                - instantiates function:    string&& move(string &&t);
+
+
+            s2  = std::move(s1);
+
+        
 */
 
-template<typename T> void f(T &p);
+// move
+template<typename T>
+typename std::remove_reference<T>::type&& move(T&& t) {
+    return static_cast<typename std::remove_reference<T>::type&&>(T);
+}
 
 
 int main()
