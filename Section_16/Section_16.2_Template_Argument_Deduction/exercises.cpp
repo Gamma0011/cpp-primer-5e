@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <utility>
 
 /*
     e16.32  - What happens during template argument deduction?
@@ -113,6 +114,19 @@
 
                 g(42);      42 is an rvalue type int. T resolves to int. vector<int>
                 g(i);       i is an lvalue. Collapses to int&. T is int&. Because of this, vector<int&>
+
+    e16.46  - Explain this loop from StrVec::reallocate()
+
+                for (std::size_t i = 0 ; i != size() ; ++i) {
+                    alloc.construct(dest++, std::move(*elem++));
+                }
+
+                This works by getting the size() of the current container. While iterating through each element of that container, we call on
+                 .construct() which takes two arguments, first the destination, and the second the source. We call std::move on the dereferenced element
+                 and move that into destination. After that, destination is incremented to the next position, as is the container from elem.
+
+    e16.47  - Write your own version of the flip function and test it by calling functions that have rvalue and lvalue reference parameters.
+
 */
 
 template<typename T>
@@ -145,6 +159,12 @@ void g(T) {
 template<typename T>
 void g(T&& val) {
     std::vector<T> v;
+}
+
+// e16.47   
+template<typename F, typename T1, typename T2>
+void flipdis(F f, T1 &&t1, T2 &&t2) {
+    f(std::forward<T1>(t1), std::forward<T2>(t2));
 }
 
 /*
@@ -197,12 +217,30 @@ void e1641() {
     std::cout << "Sum: " << sum(x,y) << std::endl; 
 }
 
+void recall(const int &a, const int &b) {
+    std::cout << b << '\t' << a << std::endl;
+}
+
+void e1647() {
+    // pass rvalues
+    flipdis(recall, 42, 10);
+
+    // pass lvalues
+    int a(100), b(2);
+    flipdis(recall, a, b);
+
+    // pass r and lvalues
+    flipdis(recall, 77, b);
+
+}
+
 int main()
 {
     //e1638();
     //e1639();
     //e1640();
     //e1641();
+    e1647();
 
     return 0;
 }

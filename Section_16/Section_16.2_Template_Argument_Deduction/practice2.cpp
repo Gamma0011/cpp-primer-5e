@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 #include <type_traits>
 
@@ -130,10 +131,79 @@
                 - parameter t has type string&&
                 - instantiates function:    string&& move(string &&t);
 
-
             s2  = std::move(s1);
-
+                - The deduced type of T is string& (reference to string)
+                - remove_reference instantiated with string&
+                - type member of remove_reference<string&> is string
+                - return type of move is string&&
+                - move's function parameter t, instantiates as string&, && collapses to string&
+                - instantiates function:    string&& move(string &t);
         
+            for std::move(s1), we want to bind an rvalue reference to an lvalue. The body of this instantiation returns static_cast<string&&>(t).
+             In this case, the type of t is string&, which the cast converts to string&&
+
+    || STATIC_CAST FROM AN LVALUE TO AN RVALUE REFERENCE IS PERMITTED ||
+        Normally, a static_cast can perform only otherwise legitmate conversions. However, there is a special dispensation for rvalue references:
+            - Even though we cannot implicitly convert an lvalue to an rvalue reference, we can explicitly cast an lvalue to an rvalue reference using static_cast
+
+        Binding an rvalue reference to an lvalue gives code that operates on the rvalue reference permission. In a case like our StrVec::allocate() function, by letting
+         us do the cast, the language allows us to clobber an lvalue. Forcing us to use a cast makes sure we don't do this accidentally.
+
+        *NOTE* It is much easier to use the std::move function, this is best practice, but you can also create your own move.
+
+    || FORWARDING ||
+        Some functions need to forward one or more of their arguments with their types unchanged to another, forwarded-to, function. In these cases, we need
+         to preserve everything about the forwarded-to arguments, including const-ness and lvalue or rvalue.
+
+        || DEFINITING FUNCTION PARAMETERS THAT RETAIN TYPE INFORMATION ||
+            In order to pass a reference through our flip function, we need to rewrite the function so that its parameters preserve the 'lvalueness' of the args.
+             Additionally, we'd like to preserve the constness.
+
+            To do this, we can preserve all the type information in an argument by definiting its corresponding function parameter as an rvalue reference to template type parameter.
+             Using a reference parameter (lvalue and rvalue) lets us preserve constness, because the const in a reference type is low-level.
+            
+            Via reference collapsing, if we define the function parameters as T1&& and T2&&, we can preserve the lvalue/rvalue property of flip's arguments.
+
+                template<typename F, typename T1, typename T2>
+                void flip2(F f, T1 &&t1, T2 &&t2) {
+                    f(t2, t1);
+                }
+
+                Calling flip2(f, j, 42) : type deduced for T1 is int& and collapses to int&, which means t1 is bound to j. When f calls j and increments, it is changing
+                 the value of j.
+        
+        *IMPORTANT* A function parameter that is an rvalue reference to a template parameter (T&&) preserves the constness and lvalue/rvalue property of corresponding argument.
+
+            void g(int &&i, int &j) { std::cout << i << " " << j << std::endl; }
+
+                Calling flip2(g, i, 42) will throw an error as the lvalue-ness of i is passed to int &&i, which requires an rvalue reference for initialization
+
+        || USING STD::FORWARD TO PRESERVE TYPE INFORMATION IN A CALL ||
+            Defined in the <utility> header, forward returns an rvalue reference to that explicit argument type. Forward MUST be valled with an explicit template argument.
+             The return type of forward<T> is T&&
+
+            We normally use std::forward to pass a function to pass a function parameter that is defined as an rvalue reference to a template type parameter.
+             Through reference collapsing on the return type, forward preserves the lvalue/rvalue nature of argument:
+
+                template<typename Type> intermediary(Type &&arg) {
+                    finalFcn(std::forward<Type>(arg));
+                }
+
+                - Type is deduced from arg.
+                - Type is used as forward's explicit template argument type.
+                - arg is rvalue reference to a template type parameter, Type represents all the type information in the argument passed to arg.
+                - If arg was rvalue, Type is nonreference and forward<Type> returns Type&&
+                - If arg was lvalue, Type is an lvalue reference type via reference collapsing - returns Type&
+
+            *NOTE 1* When used with a function parameter that is an rvalue reference to template type parameter (T&&), forward preserves all details about argument's type.
+            *NOTE 2* Do not use, using std::forward or using std::move as declarations. forward and move are common words and could cause collision with other user-defined functions of same name
+
+                Rewriting our final flip function:
+
+                template<typename F, typename T1, typename T2>
+                void flip(F f, T1 &&t1, T2 &&t2) {
+                    f(std::forward<T2>(t2), std::forward<T1>(t1));
+                }
 */
 
 // move
