@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <string>
 
@@ -23,6 +24,24 @@
 
     e16.53  - Write your own version of print functions and test them by printing 1, 2, and 5 arguments of different types.
                 see. void e1653();
+
+    e16.54  - What happens if we call print on a type that doesn't have a << operator?
+                Compiler will return an error "no match for operator<<"
+    
+    e16.55  - Explain how the variadic version of print would execute if we declared a nonvariadic version of print after the definition of a variadic function
+                Compiler will call an error on not being about to find print(os, const T&) because it's used before declaration.
+                    'error: no matching function for call to 'print(std::ostream&)'
+                        return print(os, remainder...);
+
+    e16.56  - Write and test a variadic version of errorMsg.
+
+    e16.57  - Compare your variadic version of errorMsg to the error_msg function on pg 220. What are the advantages and disadvantages of each?
+
+                    Pg. 220 works well when you know that a stream of error codes will be written into and read from an initializer list.
+                    However, in the case where there might be multiple different types of returns, a variadic version would allow for this functionality.
+
+                    I do think that the error_msg function is a bit more readable because there's more explicit statements in what is being done, as opposed to
+                    a template type where types are unknown.
 
 */
 
@@ -65,10 +84,53 @@ void e1653() {
     print(std::cout, s, i, d, f, c);
 }
 
+
+/************* e1653 *************/
+
+struct Sales_data {
+    Sales_data() = default;
+    Sales_data(std::string s) : item(s) { };
+    std::string item;
+};
+
+void e1654() {
+    //Sales_data sd("Hello");
+    //print(std::cout, sd);
+}
+
+/************* e1656 *************/
+template<typename T>
+std::string debug_ref(const T& t) {
+    std::cout << "Call to debug_ref" << std::endl;
+    std::ostringstream ret;
+    ret << t;
+    return ret.str();
+}
+
+template<typename ... Args>
+std::ostream& errorMsg(std::ostream &os, const Args& ... rest) {
+    std::cout << "Call to errorMsg" << std::endl;
+    return print(os, debug_ref(rest)...);
+}
+
+std::string retStr(const std::string &s) {
+    return s;
+}
+
+void e1655() {
+    int i = 10;
+    std::string h("hello"), w("world");
+    double d = 9.22;
+
+    errorMsg(std::cout, i, h, w, d, retStr(h));
+}
+
 int main()
 {
     //e1652();
-    e1653();
+    //e1653();
+    //e1654();
+    e1655();
 
     return 0;
 }

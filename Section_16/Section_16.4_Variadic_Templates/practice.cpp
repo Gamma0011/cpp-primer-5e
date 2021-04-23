@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -90,12 +91,76 @@
 
         *WARNING* A declaration for a nonvariadic version of a function must be in scope when a variadic version is defined. Otherwise, the variadic function will recurse indefinitely.
 
-        
+        || PACK EXPANSION ||
+            Aside from taking its size, the only other things we can do with a parameter pack is to expand it. When we expand a pack, we also provide a pattern to be used
+             on each expanded element. Expanding a pack separates the pack into its constituent elements, applying to each patter as it does so.
+            
+            We can trigger an expansion by putting (...) to the right of the pattern.
 
+            template<typename T, typename ... Args>             // EXPAND ARGS
+            std::ostream& print(std::ostream &os, const T& t, const Args& ... rest) {
+                os << t << " ";
+                return print(os, rest...);      // EXPAND REST
+            }
+
+            The first expansion (args) expands the template parameter pack and generates the function parameter list for print.
+            The second expansion (rest) generates the argument list for the call to print.
+
+            The expansion of Args applies pattern const Args& to each element in the parameter pack. The expansion of this pattern is a comma-separated
+             list of zero or more parameter types, each with the form const T&.
+
+                print(cout, s, i, d) has 2 parameters in the pack
+
+                The call is instantiated as ostream& print(ostream&, const string&, const int&, const double&)
+
+            The second expansion happens in the (recursive) call to print. In this case, the pattern is the name of the function parameter pack (rest).
+             This pattern expands to a comma-separated list of elements in the pack, same as:  
+
+                print(os, i, d);
+            
+        || UNDERSTANDING PACK EXPANSIONS ||
+            The expansion of print just expanded the pack into its constituent parts. We can make a more complicated pattern, in this case, a second
+             variadic function that calls debug_ref on each arguments, then calls print to print strings.
+
+            template<typename ... Args>
+            std::ostream& errorMsg(std::ostream &os, const Args& ... rest) {
+                return print(os, debug_ref(rest)...);
+            }
+
+            *Note* The pattern in an expansion applies separately to each element in the pack.
+
+        || FORWARDING PARAMETER PACKS ||
+            
 */
+
+template<typename T>
+std::string debug_ref(const T& s) {
+    std::ostringstream ret;
+    ret << s;
+    return ret.str();
+}
+
+template<typename T>
+std::ostream& print(std::ostream &os, const T& t) {
+    return os << t;
+}
+
+template<typename T, typename ... Args>
+std::ostream& print(std::ostream &os, const T& t, const Args&... rest) {
+    os << t << " ";
+    return print(os, rest...);
+}
+
+template<typename ... Args>
+std::ostream& errorMsg(std::ostream &os, const Args&... rest) {
+    return print(os, debug_ref(rest)...);
+}
 
 int main()
 {
+    std::string s("this"), t("is"), u("string");
+
+    errorMsg(std::cout, s, t, u);
 
     return 0;
 }
