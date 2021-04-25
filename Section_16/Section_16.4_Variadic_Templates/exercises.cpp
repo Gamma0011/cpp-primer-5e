@@ -2,6 +2,10 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <memory>
+#include "vec.h"
+#include "strVecClass.h"
+#include "shared_ptr.h"
 
 /*
     e16.51  - Determine what sizeof...(Args) and sizeof...(rest) return for each call to foo in section.
@@ -42,6 +46,44 @@
 
                     I do think that the error_msg function is a bit more readable because there's more explicit statements in what is being done, as opposed to
                     a template type where types are unknown.
+
+    e16.58  - Write emplace_back() function for your StrVec class and for Vec class in Chapter 16.
+                see. strVecClass.h and vec.h
+
+                // vec.h
+                template<typename T>
+                template<class...Args>
+                inline
+                void Vec<T>::emplace_back(Args&&...args) {
+	                chk_n_alloc();
+	                alloc.construct(first_free++, std::forward<Args>(args)...);
+                }
+
+                // strVecClass.h
+                template<class...Args>
+                inline
+                void StrVec::emplace_back(Args&&...args) {
+                    check_n_allocate();
+                    alloc.construct(lelem++, std::forward<Args>(args)...);
+                }
+
+    e16.59  - Assuming s is a string, explain svec.emplace_back(s);
+                s is an lvalue&, which becomes & &&, and collapses down to lvalue&. 
+                check_n_allocate() called to make sure there is enough room in container to store additional values.
+                construct called which iterates to next store in the heap and passes s via forward, maintianing type information because of the perfect cast.
+                lelem becomes a pointer to an object of type string.
+
+    e16.60  - Explain how make_shared works.
+                make_shared works by returning a pointer to specific memory and keeping track of how many times that object's memory is being accessed. When the object 
+                is referenced, the counter goes up, when the object stops being used, the counter goes down. When reference count = 0, the memory is automatically deleted, or when the program ends.
+
+    e16.61  - Define your own version of make_shared
+
+                template<typename T, typname ... Args>
+                shared_ptr<T> make_shared(Args&&(args)...) {
+                    return shared_ptr<T>(new T(std::forward(args)...));
+                }
+
 
 */
 
@@ -125,12 +167,28 @@ void e1655() {
     errorMsg(std::cout, i, h, w, d, retStr(h));
 }
 
+/************* e1661 *************/
+template<typename T, typename ... Args>
+shared_ptr<T> make_shared(Args&&...args) {
+    return shared_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+void e1661() {
+    int i = 10;
+    auto sip = make_shared<int>(i);
+    auto two = sip;
+    std::cout << sip << '\t' << *sip << std::endl;
+    std::cout << two << '\t' << *two << std::endl;
+
+}
+
 int main()
 {
     //e1652();
     //e1653();
     //e1654();
-    e1655();
+    //e1655();
+    e1661();
 
     return 0;
 }

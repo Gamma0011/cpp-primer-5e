@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "strVecClass.h"
 
 /*
     A variadic template is a template function or class that can take a varying number of parameters. 
@@ -130,7 +131,47 @@
             *Note* The pattern in an expansion applies separately to each element in the pack.
 
         || FORWARDING PARAMETER PACKS ||
-            
+            We can use variadic templates together with forward to write functions that pass their arguments unchanged to some other function. We'll create an emplace_back
+             version for StrVec that will also have to variadic because string has a number of constructors that differ in terms of their parameters.
+
+            Because we'd like to be able to use string move constructors, we'll also need to preserve all the type information about the arguments passed to emplace_back.
+
+            2 steps are required to preserve type info: 1st, define emplace_back's function parameters are rvalues& to template type parameters. 2nd, we must use forward
+             to preserve the arguments' original types when emplace_back passes those arguments to construct.
+
+            class StrVec {
+            public:
+                template<class ... Args> void emplace_back(Args&&...);
+            };
+
+            template<class ... Args>
+            inline
+            void StrVec::emplace_back(Args&&...args) {
+                chk_n_alloc();      // reallocates StrVec if needed
+                alloc.construct(first_free++, std::forward<Args>(args)...);
+            }
+
+            chk_n_alloc() ensures that there is enough room for an element and calls construct to create an element in first_free spot.
+            std::forward<Args>(args)... expands template parameter pack (Args), and function parameter pack (args)
+
+            In a call such as svec.emplace_back(10, 'c'), the pattern in call to construct is std::forward<int>(10), std::forward<char>(c);
+            By using forward, we guarantee that if emplace_back is called with an rvalue, the construct gets an value
+
+            svec.emplace_back(s1+s2);       // this is an rvalue argument, and construct called with rvalue&
+
+            *ADVICE: Forwarding and Variadic Templates*
+                Variadic functions often forward their parameters to other functions.
+
+                template<typename ... Args>
+                void fun(Args&&...args) {
+                    work(std::forward<Args>(args)...);
+                }
+
+                This template forwards all of fun's arguments to another function named work() that does the real work of the function. Like our call to construct
+                 inside emplace_back, the expansion in the call to work expandsboth the template parameter pack and the function parameter pack. Because of
+                 rvalue& type, we can pass all types, and because we used std::forward, all type information is preserved in call to work
+
+        
 */
 
 template<typename T>
