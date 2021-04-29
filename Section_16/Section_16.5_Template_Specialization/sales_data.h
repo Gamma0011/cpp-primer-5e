@@ -3,14 +3,12 @@
 
 #include <string>
 #include <iostream>
-#include "hash.h"
 
 class Sales_data{
     friend std::istream& operator>>(std::istream&, Sales_data&);
     friend std::ostream& operator<<(std::ostream&, Sales_data&);
     friend bool operator==(const Sales_data&, const Sales_data&);
     friend bool operator!=(const Sales_data&, const Sales_data&);
-
     friend class std::hash<Sales_data>;
 public:
     Sales_data& operator=(const std::string &s);             // assign string to bookNo;
@@ -27,6 +25,26 @@ public:
     unsigned units_Sold = 0;
     double revenue = 0;
 };
+
+namespace std{  
+    template<>                  // defining a specialization with
+    struct hash<Sales_data>{    // the template parameter of Sales_data
+        // type used to hash an unordered container must define these types
+        typedef std::size_t result_type;
+        typedef Sales_data argument_type;      // by default, this needs ==
+        
+        std::size_t operator()(const Sales_data& s) const;
+    };
+
+    std::size_t
+    hash<Sales_data>::operator()(const Sales_data& s) const {
+        return  hash<std::string>()(s.bookNo) ^
+                hash<unsigned>()(s.units_Sold) ^
+                hash<double>()(s.revenue);
+    }
+
+}   // close std namespace; note no semicolon
+
 
 Sales_data&
 Sales_data::operator=(const std::string &s) {
