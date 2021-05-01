@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <unordered_set>
@@ -19,6 +20,37 @@
 
     e16.65  - In 16.3, we defined overloaded two version of debug_rep and one had const char&, the other char*. 
                 Rewrite these as specializations.
+
+    e16.66  - What are the advantages and disadvantages of overloaded these debug_rep functions compared to definition specializations?
+
+                http://www.gotw.ca/publications/mill17.htm
+                
+                Overload resolution considers all base templates equally and works in a way that you would naturally expect function overloading to work.
+                Specializations don't overload, meaning that they will not affect which template gets used and most other things might be a better match,
+                 even if logically the Specialization is the *best* match
+    
+    e16.67  - Would defining these specializations affect function matching for debug_rep? If so, how?
+                In the case of only having the base class template and no other overloads, there would be no affect on function matching.
+                However, providing an overload of the template to std::string debug_rep(T*), the compiler will chose this function match
+                over any specialization -- in our case, template<> std::string debug_rep(const char* const &) is ignored.
+
+                The compiler will always select overloaded templates over specialized ones for matching.
+
+                template<typename T>
+                std::string debug_ref(T* t) {
+                    std::cout << "T* called" << std::endl;
+                    std::ostringstream ret;
+                    ret << t;
+                return ret.str();
+                }
+
+                template<>
+                std::string debug_ref(const char* const &c) {
+                    std::cout << "const char* const & called" << std::endl;
+                    std::ostringstream ret;
+                    ret << c;
+                    return ret.str();
+                }
 
 */
 
@@ -88,12 +120,51 @@ void e1663() {
     std::cout << csearch << "'s found: " << counter<const char*>(cvec, csearch) << std::endl;
 }
 
+/************** e16.65 **************/
+template<typename T>
+std::string debug_ref(const T &t) {
+    std::cout << "const &T called" << std::endl;
+    std::ostringstream ret;
+    ret << t;
+    return ret.str();
+}
 
+template<typename T>
+std::string debug_ref(T* t) {
+    std::cout << "T* called" << std::endl;
+    std::ostringstream ret;
+    ret << t;
+    return ret.str();
+}
+
+template<>
+std::string debug_ref(const char* const &c) {
+    std::cout << "const char* const & called" << std::endl;
+    std::ostringstream ret;
+    ret << c;
+    return ret.str();
+}
+
+template<>
+std::string debug_ref(char* const &c) {
+    std::cout << "char* const & called" << std::endl;
+    std::ostringstream ret;
+    ret << c;
+    return ret.str();
+}
+
+void e1665() {
+    const char* c = "Hello!";
+    //char* cp = "Goodbye!";
+    std::cout << debug_ref(c) << std::endl;
+    //std::cout << debug_ref(cp) << std::endl;
+}
 
 int main()
 {
     //e1662();
     //e1663();
+    e1665();
 
     return 0;
 }
