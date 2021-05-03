@@ -12,6 +12,7 @@ class Sales_data{
     friend class std::hash<Sales_data>;
 public:
     Sales_data& operator=(const std::string &s);             // assign string to bookNo;
+    Sales_data& operator+(const Sales_data&);
     Sales_data& operator+=(const Sales_data&);
     Sales_data& operator-=(const Sales_data&);
 
@@ -62,10 +63,31 @@ double Sales_data::avg_price() const {
 
 
 /*************** NON-MEMBER FUNCTIONS ***************/
+std::istream&
+operator>>(std::istream &in, Sales_data &s) {
+    double price = 0;
+    in >> s.bookNo >> s.units_Sold >> price;
+    if (in) {
+        s.revenue = price * s.units_Sold;
+    } else {
+        s = Sales_data();
+    }
+    return in;
+}
+
 std::ostream&
 operator<<(std::ostream &os, const Sales_data &s) {
     os << s.bookNo << " " << s.revenue << " " << s.units_Sold;
     return os;
+}
+
+Sales_data& Sales_data::operator+(const Sales_data &data) {
+    if (this->bookNo == data.bookNo) {
+        this->revenue += data.revenue;
+        this->units_Sold += data.units_Sold;
+        return *this;
+    }
+    return *this;
 }
 
 bool operator==(const Sales_data &lhs, const Sales_data &rhs) {
@@ -78,6 +100,18 @@ bool operator!=(const Sales_data &lhs, const Sales_data &rhs) {
     return !(lhs == rhs);
 }
 
+bool compareIsbn(const Sales_data& lhs, const Sales_data& rhs) {
+    return lhs.bookNo < rhs.bookNo;
+}
 
+std::vector<Sales_data>
+build_vectors(std::ifstream &in) {
+    std::vector<Sales_data> file;
+    Sales_data book;
+    while (in >> book) {
+        file.emplace_back(book);
+    }
+    return file;
+}
 
 #endif

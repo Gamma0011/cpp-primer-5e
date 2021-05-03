@@ -1,7 +1,9 @@
 #ifndef FIND_BOOKS_H
 #define FIND_BOOKS_H
 
+#include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -31,6 +33,23 @@ findBook(const std::vector<std::vector<Sales_data>> &files,
     return ret;     // empty if no matches found
 }
 
+void reportResults(std::istream &in, std::ostream &os,
+                   const std::vector<std::vector<Sales_data>> &files) {
+    std::string s;  // book to look for
+    while (in >> s) {
+        auto trans = findBook(files, s);    // stores that sold this book
+        if (trans.empty()) {
+            std::cout << s << " not found in stores." << std::endl;
+            continue;           // get next book to look for
+        }
+        for (const auto &store : trans) { // for every store with a sale
+            // get<n> returns specified member from tuple in store
+            os << "store " << std::get<0>(store) << " sales: "
+               << std::accumulate(std::get<1>(store), std::get<2>(store), Sales_data(s))
+               << std::endl;
+        }
+    }
 
+}
 
 #endif

@@ -75,7 +75,24 @@
          a tuple to hold the index of the store and two iterators. Index will be position of matching store in files. Iterators will mark first and 1 past last
          record for given book in the store's vector<Sales_data>
 
-         
+        The for loop iterates through the elements in files. Those elements are themselves vectors.
+         Inside the for, we call a library algorithm called equal_range. First two arguments are iterators denoting an inputs
+         sequence. The third is a value. By default equal_range uses < operator to compare elements. Because Sales_data does not have a <
+         we pass a * to the compareIsbn Function
+
+        The equal_range algorithm returns a pair of iterators that denote a range of elements. If book not found, iterators will be == indicating an empty range.
+         Otherwise, first member of pair will denote first match and second will be one past last match.
+
+        void reportResults will be used to process the transactions.
+
+        The while loop repeatedly reads istream namedin to get the next book to process. We call findBooks to see if s is present, and assign the results to trans.
+         We use auto to simplify writing the type of trans, which is a vector of tuples.
+         If trans.empty(), no sales for s. Since no intent to write to store, declare as const&.
+
+         std::get will print relevent data, get<0> index of store, get<1> iterator to first transaction, get<2> iterator to one past last transaction.
+        
+        Because Sales_data defines the addition operator, we can use std::accumulate to sum transactions. We pass Sales_data object initialized by Sales_data(const string&)
+         as a starting point to summation. That constructor initializes bookNo member and default-initialized units_sold and revenue to 0
 */
 
 
