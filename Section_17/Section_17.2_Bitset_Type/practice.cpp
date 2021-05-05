@@ -93,19 +93,50 @@
 
         || RETRIEVING THE VALUE OF A BITSET.
 
-        00000000    = 1 byte, 8 bits
+        The to_ulong and to_ullong operations return a value that holds the same bit pattern as the bitset object. We can use these operations only if
+         the size of the bitset is less than or equal to the corresponding size, unsigned long for to_ulong and unsigned long long for to_ullong
+
+         unsigned long ulong = bitvec3.to_ulong();
+         std::cout << "ulong = " << ulong << std::endl;
+
+        *NOTE* Operations throw an overflow_error exception if the value in the bitset does not fit the specified type.
+
+        || BITSET IO OPERATORS ||
+            The input operator reads characters from the input stream into a temporary object of type string. It reads until it has read as many characters
+             as the size of the bitset or until it receives a character other than 0 or 1, or encounters end-of-file or input error.
+
+            The bitset is initialized from that temporary string. If fewer characters are read than the size of a bitset, the high-order bits are, as usual 0.
+
+            Output operator prints the bit pattern in a bitset object:
+
+                bitset<16> bits;
+                std::cin >> bits;                       // read up to 16 1 or 0 characters
+                std::cout << bits << std::endl;         // print what was read
+
+        || USING BITSETS ||
+            Rewriting the pass/fail code
+
+            bool status;
+            bitset<30> quiz;
+            quiz.set(27);       // indicate student 27 passed
+            status = quiz(27);  // return true
+            quiz.reset(27);     // bit turned off now.
 
 */
 
 void bitset_practice() {
     std::bitset<32> b;
-    
+    std::bitset<128> ull(~0ULL);
+
     std::cout << std::bitset<9>(0xbeef) << std::endl;
     std::cout << std::bitset<20>(0xbeef) << std::endl;
     std::cout << std::bitset<128>(~0ULL) << std::endl;
     std::cout << std::bitset<32>("1100") << std::endl;
     std::cout << std::bitset<32>(1U) << std::endl;
     std::cout << b.set(b.size()-1) << std::endl;
+
+    // unsigned long ulong = ull.to_ulong();
+    // std::cout << ulong << std::endl;
 
 }
 
