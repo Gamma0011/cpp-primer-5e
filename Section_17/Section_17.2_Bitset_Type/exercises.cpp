@@ -13,6 +13,13 @@
     e17.11  - Define a data structure that contains an integral object to track responses to true/false quiz containing 10 questions. What changes
                 would you make if the structure of the quiz had 100 questions?
 
+                You would have to increase the bitset from 10 to 100 and also define all answers in the master_answers bitset.
+
+    e17.12  - Using the data structure from the previous question, write a function that takes a question number and a value to indicate true/false and update quiz accordingly.
+                see struct Test_Grades;
+    
+    e17.13  - Write an integral object that contains the correct answer for the true/false quiz. Use it to generate grades on the quiz.
+                see. all of struct Test_Grades;
 */
 
 void e179(){
@@ -51,38 +58,39 @@ void e1710() {
 struct Test_Grades {
     Test_Grades() = default;
 
-    void enter_answers() {
-        char c;
-        for (std::size_t count = 0 ; count != user_answers.size() ; ++count) {
-            std::cout << "Please enter Student's answer for Question #" << count+1 << "\n(T/F): ";
-            std::cin >> c;
-            if (c == 'T' || 't') {
-                user_answers.set(count);
-            }
-            if (c == 'F' || 'f') {
-                user_answers.reset(count);
-            }
-            else {
-                std::cerr << "ERROR: Invalid character. Please only use T or F." << std::endl;
-            }
-        }
-        std::cout << user_answers << std::endl;
-        std::cout << master_answers << std::endl;
-    }
-
     void check_answers() {
-        std::size_t number_correct;
-        for(std::size_t count = 0 ; count != master_answers.size() ; ++count) {
-            if (master_answers.test(count) == user_answers.test(count)) {
+        std::size_t number_correct = 0;
+        for (std::size_t count = 0 ; count != master_answers.size() ; ++count) {
+            if (master_answers[count] == user_answers[count]) {
                 ++number_correct;
             }
         }
-        std::cout << "Total Correct: " << number_correct << " out of " << master_answers.size() << std::endl;
+        std::cout << "Total Correct: " << number_correct << " out of " << master_answers.size() 
+                  << " | " << pass_fail_check(number_correct, master_answers.size()) << std::endl;
     }
 
+    void enter_answers() {
+       std::string s;
+       for (std::size_t count = 0 ; count != user_answers.size() ; ++count) {
+            std::cout << "Please enter answer to question #" << count+1 << ": ";
+            std::cin >> s;
+            s == "t" ? user_answers.set(count) : user_answers.reset(count);
+            user_answers[count] == master_answers[count] ? 
+                    std::cout << "Correct" << std::endl  :
+                    std::cout << "Incorrect" << std::endl;  
+       }
+   }
+
 private:
-    std::bitset<10> master_answers{"0110100101"};
+    const std::bitset<10> master_answers{"0000100101"};
     std::bitset<10> user_answers;
+
+    std::string pass_fail_check(std::size_t correct, std::size_t total) {
+        if (correct >= (total*0.7)) {
+            return "Pass";
+        }
+        return "Fail";
+    }
 };
 
 void e1711() {
